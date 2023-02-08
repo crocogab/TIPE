@@ -14,10 +14,7 @@ class Card:
         self.suit = suit
 
     def __str__(self):
-        print("Valeur: ", self.value, "\r")
-        print("Suit: ", self.suit, "\r")
-        print("--------------------------")
-        return ""
+        return f"Card : {self.value} of {self.suit}"
 
 
 class hand:
@@ -30,15 +27,14 @@ class hand:
     def __str__(self):
         return f"Nombre de cartes [MAIN] : {self.nb_cards} , cartes = {self.l_cards}"
 
-    def add_card(self, card: Card) -> list:
-        """ Prends une carte en argument et ajoute a la main"""
-        self.l_cards.append(card)
+    def as_value(self) -> int:
+        # TODO: faire une fonction qui calcule la valeur de l'as et l'utiliser dans get_value
+        pass
 
     def get_value(self) -> int:
         total = 0
         for card in self.l_cards:
-            total += card.value
-        return total
+            total += card.value if card.value < 10 else 10
 
 
 class Deck:
@@ -49,7 +45,7 @@ class Deck:
     def __str__(self):
         return f"Nombre de cartes [PILE] : {self.nb_cards} , cartes = {self.l_cards}"
 
-    def swap(self, i, j):
+    def swap(self, i: int, j: int):
         temp = self.l_cards[j]
         self.l_cards[j] = self.l_cards[i]
         self.l_cards[i] = temp
@@ -59,14 +55,41 @@ class Deck:
             self.swap(i, rd.randint(0, self.nb_cards-1))
 
 
-def make_deck():
-    deck = Deck(52, [])
-    for i in range(4):
-        for j in range(1, 14):
-            deck.l_cards.append(Card(j, suits[i]))
-    deck.shuffle()
-    for i in range(deck.nb_cards):
-        print(deck.l_cards[i])
+class Player:
+    def __init__(self, hand: hand, id: int):
+        self.id = id
+        self.hand = hand
+        self.is_out = False
+
+    def check(self):
+        if self.hand.get_value() > 21:
+            self.is_out = True
 
 
-make_deck()
+def make_deck(n: int) -> Deck:
+    """
+    returns a deck of n*52 cards
+    """
+    deck = Deck(n*52, [])
+    for i in range(n):
+        for i in range(4):
+            for j in range(1, 14):
+                deck.l_cards.append(Card(j, suits[i]))
+    for cards in deck.l_cards:
+        print(cards)
+    return deck
+
+
+def tick():
+    """
+    Fonction qui gere les tours de jeu (distribution, verification, etc.)
+    """
+
+    pass
+
+
+def simulation(p: int, n: int):
+    """
+    Fonction qui simule n parties de blackjack avec p joueurs
+    """
+    pass
