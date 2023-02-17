@@ -26,7 +26,7 @@ class Hand:
 
     def __str__(self):
         # l'ancienne version ne marchait pas (cards.l_cards) ça affichait l'adresse mémoire
-        string = f"Nombre de cartes : {self.nb_cards} , cartes = "
+        string = f"Nombre de cartes : {self.nb_cards} ,total = {self.get_value()} ,cartes = "
         for card in self.l_cards:
             string += str(card) + " "
         return string
@@ -78,10 +78,17 @@ class Deck:
         """
         Retourne la carte du dessus du deck et la supprime du deck
         """
-        card = self.l_cards[0]
-        self.l_cards.pop(0)
-        self.nb_cards -= 1
-        return card
+        if self.nb_cards>=1: 
+            """Evite de pop un deck vide"""
+            card = self.l_cards[0]
+            self.l_cards.pop(0)
+            self.nb_cards -= 1
+            return card
+        else:
+            raise Exception("Deck is empty")
+
+            
+        
 
 
 class Player:
@@ -167,7 +174,7 @@ def game(players: list):
                 player.check()
     print("Fin de la partie, gagant :")
     winner = [player for player in players if not player.is_out][0]
-    print(f"Joueur {winner.id} : {winner.hand} : {winner.hand.get_value()}")
+    print(f"Joueur {winner.id} : {winner.hand} ")
 
 
 hector = Player(Hand(0, []), 0)
