@@ -14,10 +14,10 @@ class Card:
         self.suit = suit
 
     def __str__(self):
-        return f"Card : {self.value} of {self.suit}"
+        return f"{self.value} of {self.suit}"
 
 
-class hand:
+class Hand:
     """Classe de la main"""
 
     def __init__(self, nb_cards: int, l_cards: list):
@@ -25,19 +25,28 @@ class hand:
         self.l_cards = l_cards
 
     def __str__(self):
-        return f"Nombre de cartes [MAIN] : {self.nb_cards} , cartes = {self.l_cards}"
-
-    def as_value(self) -> int:
-        # TODO: faire une fonction qui calcule la valeur de l'as et l'utiliser dans get_value
-        pass
-
-    def get_value(self) -> int:
-        """
-        Fonction qui retourne la valeur de la main
-        """
-        total = 0
+        # l'ancienne version ne marchait pas (cards.l_cards) ça affichait l'adresse mémoire
+        string = f"Nombre de cartes : {self.nb_cards} , cartes = "
         for card in self.l_cards:
-            total += card.value if card.value < 10 else 10
+            string += str(card) + " "
+        return string
+
+    def get_value(self):
+        """
+        calcul de la valeur de la main: si elle est > 21, alors on regarde si on a un as, si oui on le transforme en 1
+        """
+        value = 0
+        for card in self.l_cards:
+            if card.value == 1:
+                value += 11
+            elif card.value > 10:
+                value += 10
+            else:
+                value += card.value
+        for card in self.l_cards:
+            if value > 21 and card.value == 1:
+                value -= 10
+        return value
 
 
 class Deck:
@@ -82,7 +91,8 @@ class Player:
     is_out: true = le joueur est out(+21), false = le joueur est en jeu
     stopped: true = le joueur a arreté de tirer des cartes, false = le joueur peut encore tirer des cartes
     """
-    def __init__(self, hand: hand, id: int):
+
+    def __init__(self, hand, id: int):
         self.id = id
         self.hand = hand
         self.is_out = False
@@ -93,24 +103,37 @@ class Player:
         Fonction qui verifie si le joueur est out
         """
         if self.hand.get_value() > 21:
+            print(f"{self.hand}\n")
+            print(f"Joueur {self.id} est out")
             self.is_out = True
+        elif self.hand.get_value() == 21:
+            print("BLACKJACK !")
+            self.stopped = True
 
-    def play(self):
+    def play(self, game):
         """
         Fonction qui permet au joueur de jouer
         """
-        # TODO: implémenter le choix
-        choice = True
-        if choice and not self.stopped:
-            Game.give_card(self)
-        else:
-            self.stopped = True
+        if not self.is_out and not self.stopped:
+            print("Voulez vous prendre une carte (o/n)")
+            choice = input()
+            if choice == "o" or choice == "O":
+                game.give_card(self)
+                self.check()
+            elif choice == "n" or choice == "N":
+                self.stopped = True
+            else:
+                print("Choix invalide")
+                self.play(game)
 
 
 class Game:
     def __init__(self, players: list, deck: Deck):
         self.players = players
         self.deck = deck
+
+    def get_deck(self):
+        return self.deck
 
     def give_card(self, player: Player):
         """
@@ -129,21 +152,24 @@ def make_deck(n: int) -> Deck:
         for i in range(4):
             for j in range(1, 14):
                 deck.l_cards.append(Card(j, suits[i]))
-    for cards in deck.l_cards:
-        print(cards)
     return deck
 
 
-def tick():
-    """
-    Fonction qui gere les tours de jeu (distribution, verification, etc.)
-    """
+def game(players: list):
+    deck = make_deck(1)
+    deck.shuffle(100)
+    game = Game(players, deck)
+    while len([player for player in players if (not player.stopped and not player.is_out)]) > 1:
+        for player in players:
+            if not player.stopped and not player.is_out:
+                print(f"Joueur {player.id} : {player.hand}")
+                player.play(game)
+                player.check()
+    print("Fin de la partie, gagant :")
+    winner = [player for player in players if not player.is_out][0]
+    print(f"Joueur {winner.id} : {winner.hand} : {winner.hand.get_value()}")
 
-    pass
 
-
-def simulation(p: int, n: int):
-    """
-    Fonction qui simule n parties de blackjack avec p joueurs
-    """
-    pass
+hector = Player(Hand(0, []), 0)
+gabriel = Player(Hand(0, []), 1)
+game([hector, gabriel])
