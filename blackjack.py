@@ -16,7 +16,7 @@ class Card:
     def __str__(self):
         if self.value > 10:
             if self.value == 11:
-                return f"Joker of {self.suit}"
+                return f"Jake of {self.suit}"
             if self.value == 12:
                 return f"Queen of {self.suit}"
             if self.value == 13:
