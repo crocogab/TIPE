@@ -14,7 +14,15 @@ class Card:
         self.suit = suit
 
     def __str__(self):
-        return f"{self.value} of {self.suit}"
+        if self.value > 10:
+            if self.value == 11:
+                return f"Joker of {self.suit}"
+            if self.value == 12:
+                return f"Queen of {self.suit}"
+            if self.value == 13:
+                return f"King of {self.suit}"
+        else:
+            return f"{self.value} of {self.suit}"
 
 
 class Hand:
@@ -30,6 +38,11 @@ class Hand:
         for card in self.l_cards:
             string += str(card) + " "
         return string
+    
+    def get_bot_hand(self):
+        """Fonction permettant au bot d'obtenir la liste des cartes justes en int"""
+        return [card.value for card in self.l_cards]
+
 
     def get_value(self):
         """
@@ -132,6 +145,37 @@ class Player:
             else:
                 print("Choix invalide")
                 self.play(game)
+    
+    
+    def rand_play(self, game):
+        """Permet au bot de jouer (aléatoirement)"""
+        if not self.is_out and not self.stopped:
+            r=rd.randint(0,2)
+            print(r)
+            if r > 0 or self.hand.l_cards==[]:
+                """66% de chance de tirer ou tire forcement si premier choix"""
+                game.give_card(self)
+                self.check()
+            else:
+                self.stopped = True
+        
+    
+    def bot_play(self, game,choice:bool):
+        """Permet au bot de jouer (sans input)
+        choice: true = prend une carte, false = rester
+
+        """
+        if not self.is_out and not self.stopped:
+            if choice :
+                game.give_card(self)
+                self.check()
+            else:
+                self.stopped = True
+
+
+            
+
+
 
 
 class Game:
@@ -148,6 +192,7 @@ class Game:
         """
         player.hand.l_cards.append(self.deck.draw())
         player.hand.nb_cards += 1
+
 
 
 def make_deck(n: int) -> Deck:
@@ -168,13 +213,17 @@ def game(players: list):
     game = Game(players, deck)
     while len([player for player in players if (not player.stopped and not player.is_out)]) > 1:
         for player in players:
+            print(f"Test : {player.hand.get_bot_hand()}")
+
             if not player.stopped and not player.is_out:
                 print(f"Joueur {player.id} : {player.hand}")
                 player.play(game)
                 player.check()
-    print("Fin de la partie, gagant :")
-    winner = [player for player in players if not player.is_out][0]
-    print(f"Joueur {winner.id} : {winner.hand} ")
+    print("Fin de la partie, gagnant(s) :")
+    winners = [player for player in players if not player.is_out]
+
+    for player in winners:
+        print(f"Joueur {player.id} : {player.hand} ")
 
 
 hector = Player(Hand(0, []), 0)
