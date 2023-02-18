@@ -213,8 +213,6 @@ def game(players: list):
     game = Game(players, deck)
     while len([player for player in players if (not player.stopped and not player.is_out)]) > 1:
         for player in players:
-            print(f"Test : {player.hand.get_bot_hand()}")
-
             if not player.stopped and not player.is_out:
                 print(f"Joueur {player.id} : {player.hand}")
                 player.play(game)
@@ -226,6 +224,6 @@ def game(players: list):
         print(f"Joueur {player.id} : {player.hand} ")
 
 
-hector = Player(Hand(0, []), 0)
-gabriel = Player(Hand(0, []), 1)
-game([hector, gabriel])
+# hector = Player(Hand(0, []), 0)
+# gabriel = Player(Hand(0, []), 1)
+# game([hector, gabriel])
