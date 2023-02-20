@@ -111,7 +111,7 @@ class Croupier:
         self.stopped = False
         self.is_croupier= True
     
-    def check(self):
+    def check(self,game):
         """
         Fonction qui verifie si le croupier est out et si il blackjack gagne
         """
@@ -135,7 +135,7 @@ class Croupier:
                     print(f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}")
 
                 game.give_card(self)
-                self.check()
+                self.check(game)
             else :
                 print("Le croupier s'arrete")
                 self.stopped = True
@@ -162,7 +162,7 @@ class Player:
         self.stopped = False
         self.is_croupier= False
 
-    def check(self):
+    def check(self,game):
         """
         Fonction qui verifie si le joueur est out
         """
@@ -183,7 +183,7 @@ class Player:
             choice = input()
             if choice == "o" or choice == "O":
                 game.give_card(self)
-                self.check()
+                self.check(game)
             elif choice == "n" or choice == "N":
                 self.stopped = True
             else:
@@ -261,7 +261,7 @@ def game(players: list):
             if not player.stopped and not player.is_out:
                 print(f"Joueur {player.id} : {player.hand}")
                 player.play(game)
-                player.check()
+                player.check(game)
     print("Fin de la partie, gagnant(s) :")
     
     croupier_is_out=True
@@ -280,9 +280,11 @@ def game(players: list):
         for player in players :
             """ ATTENTION SOIT CROUPIER SOIT AUTRES A PATCH"""
             if not player.is_out and player.is_croupier:
-                print(f"Croupier toujours en game")
+                print(f"Croupier avec le jeu : {player.hand} total = {player.hand.get_value()}")
 
-            if not player.is_out and player.hand.get_value() > croupier_hand_value:
+
+
+            if not player.is_out and player.hand.get_value() > croupier_hand_value and not player.is_croupier:
                 print(f"Joueur {player.id} : {player.hand} ")
             if not player.is_out and player.hand.get_value() == croupier_hand_value and not player.is_croupier:
 
