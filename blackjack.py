@@ -278,7 +278,7 @@ def game(players: list):
                 print(f"Joueur {player.id} : {player.hand} ")
     else:
         for player in players :
-            """ ATTENTION SOIT CROUPIER SOIT AUTRES A PATCH"""
+            
             if not player.is_out and player.is_croupier:
                 print(f"Croupier avec le jeu : {player.hand} total = {player.hand.get_value()}")
 
