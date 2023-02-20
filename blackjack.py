@@ -100,7 +100,50 @@ class Deck:
         else:
             raise Exception("Deck is empty")
 
+class Croupier:
+    """
+    Classe de la croupier
+    """
+    def __init__(self, hand,id:int):
+        self.id = id
+        self.hand = hand
+        self.is_out = False
+        self.stopped = False
+        self.is_croupier= True
+    
+    def check(self):
+        """
+        Fonction qui verifie si le croupier est out et si il blackjack gagne
+        """
+        if self.hand.get_value() > 21:
+            print(f"{self.hand}\n")
+            print(f"Croupier est out")
+            self.is_out = True
+        
+        elif self.hand.get_value() == 21:
+            print("Blackjack du croupier ! La banque récupère la mise \n")
+            self.stopped = True
+            for player in game.players:
+                player.is_out = True
+            self.is_out = False
+    
+    def play(self, game):
+        if not self.is_out and not self.stopped:
+            if self.hand.get_value() < 17:
+                print(f"Croupier pioche.")
+                if self.hand.l_cards != []:
+                    print(f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}")
+
+                game.give_card(self)
+                self.check()
+            else :
+                print("Le croupier s'arrete")
+                self.stopped = True
             
+
+
+
+
         
 
 
@@ -117,6 +160,7 @@ class Player:
         self.hand = hand
         self.is_out = False
         self.stopped = False
+        self.is_croupier= False
 
     def check(self):
         """
@@ -182,6 +226,7 @@ class Game:
     def __init__(self, players: list, deck: Deck):
         self.players = players
         self.deck = deck
+        
 
     def get_deck(self):
         return self.deck
@@ -218,12 +263,40 @@ def game(players: list):
                 player.play(game)
                 player.check()
     print("Fin de la partie, gagnant(s) :")
-    winners = [player for player in players if not player.is_out]
+    
+    croupier_is_out=True
+    
+    for player in players :
+        if not player.is_out:
+            if player.is_croupier :
+                croupier_is_out=False
+                croupier_hand_value=player.hand.get_value()
+    
+    if croupier_is_out:
+        for player in players:
+            if not player.is_out:
+                print(f"Joueur {player.id} : {player.hand} ")
+    else:
+        for player in players :
+            """ ATTENTION SOIT CROUPIER SOIT AUTRES A PATCH"""
+            if not player.is_out and player.is_croupier:
+                print(f"Croupier toujours en game")
 
-    for player in winners:
-        print(f"Joueur {player.id} : {player.hand} ")
+            if not player.is_out and player.hand.get_value() > croupier_hand_value:
+                print(f"Joueur {player.id} : {player.hand} ")
+            if not player.is_out and player.hand.get_value() == croupier_hand_value and not player.is_croupier:
+
+                print(f"Joueur {player.id} est à égalité avec le croupier. Il récupère sa mise ")
 
 
-# hector = Player(Hand(0, []), 0)
-# gabriel = Player(Hand(0, []), 1)
-# game([hector, gabriel])
+        
+            
+
+
+
+
+hector = Player(Hand(0, []), 0)
+gabriel = Player(Hand(0, []), 1)
+croupier = Croupier(Hand(0, []), 2)
+
+game([hector, gabriel,croupier])
