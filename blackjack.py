@@ -241,12 +241,7 @@ class Game:
         player.hand.l_cards.append(self.deck.draw())
         player.hand.nb_cards += 1
     
-    def number_player(self):
-        count=0
-        for player in self.players:
-            if not player.stopped and not player.is_out:
-                count+=1
-        return count
+    
 
 
 

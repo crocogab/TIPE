@@ -5,14 +5,14 @@ def generate_game(players: list):
     deck = make_deck(1)
     deck.shuffle(100)
     game = Game(players, deck)
-    while game.number_player() > 1:
+    for _ in range(50) :
         for player in game.players:
             if not player.stopped and not player.is_out:
-                if not player.is_croupier:
-                    player.rand_play(game)
+                if player.is_croupier:
+                    player.play(game)
                     #player.check(game) 
                 else:
-                    player.play(game)
+                    player.rand_play(game)
                     # player.check(game)
     
 
@@ -29,23 +29,28 @@ def generate_game(players: list):
     if croupier_is_out:
         for player in players:
             if not player.is_out:
-                resultats.append([player.id,False,player.hand.get_value(),False,2])
+                resultats.append([player.id,0,player.hand.get_value(),0,2])
+                
     else:
         for player in players :
             
             if not player.is_out and player.is_croupier:
-                resultats.append([player.id,True,player.hand.get_value(),False,0,player.stopped])
+                resultats.append([player.id,1,player.hand.get_value(),0,0])
             if not player.is_out and player.hand.get_value() > croupier_hand_value and not player.is_croupier:
-                resultats.append([player.id,False,player.hand.get_value(),False,2])
+                resultats.append([player.id,0,player.hand.get_value(),0,2])
             if not player.is_out and player.hand.get_value() == croupier_hand_value and not player.is_croupier:
-                resultats.append([player.id,False,player.hand.get_value(),False,1])
+                resultats.append([player.id,0,player.hand.get_value(),0,1])
     list_id=[elem[0] for elem in resultats]
     for player in players:
         if player.id not in list_id:
             if player.is_croupier:
-                resultats.append([player.id,True,player.hand.get_value(),True,0])
+                resultats.append([player.id,1,player.hand.get_value(),1,0])
             else:
-                resultats.append([player.id,False,player.hand.get_value(),True,0])
+                resultats.append([player.id,0,player.hand.get_value(),1,0])
+    for data in resultats:
+        data=data[1:]
+        
+
     return resultats
 
 
@@ -56,6 +61,13 @@ croupier = Croupier(Hand(0, []), 2)
 players = [hector, gabriel,croupier]
 
 print(generate_game(players))
+
+all_games=[]
+
+for i in range(100):
+    all_games.append(generate_game(players))
+
+print(all_games)
         
 
             
