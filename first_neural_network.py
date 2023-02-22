@@ -5,14 +5,15 @@ def generate_game(players: list):
     deck = make_deck(1)
     deck.shuffle(100)
     game = Game(players, deck)
-    while len([player for player in players if (not player.stopped and not player.is_out)]) > 1:
-        for player in players:
+    while game.number_player() > 1:
+        for player in game.players:
             if not player.stopped and not player.is_out:
                 if not player.is_croupier:
                     player.rand_play(game)
-                    player.check(game) 
+                    #player.check(game) 
                 else:
                     player.play(game)
+                    # player.check(game)
     
 
     resultats=[] #dans l'ordre : id,is_croupier,total,is_out,is_winner
@@ -33,7 +34,7 @@ def generate_game(players: list):
         for player in players :
             
             if not player.is_out and player.is_croupier:
-                resultats.append([player.id,True,player.hand.get_value(),False,0])
+                resultats.append([player.id,True,player.hand.get_value(),False,0,player.stopped])
             if not player.is_out and player.hand.get_value() > croupier_hand_value and not player.is_croupier:
                 resultats.append([player.id,False,player.hand.get_value(),False,2])
             if not player.is_out and player.hand.get_value() == croupier_hand_value and not player.is_croupier:
@@ -58,21 +59,6 @@ print(generate_game(players))
         
 
             
-
-            
-           
-# def generate_data(nb:int):
-#     """Donnees du bot:
-#     -is_croupier (0/1)
-#     -jeu (tableau contenant 10 valeurs de 1 à 13) / le total (à voir)
-#     -is_out (0/1)
-#     -gagnant (0/1 et le croupier = 1 si gagne)
-
-#     """
-#     hector = Player(Hand(0, []), 0)
-#     gabriel = Player(Hand(0, []), 1)
-#     croupier = Croupier(Hand(0, []), 2)
-#     game([hector, gabriel,croupier])
 
 
     

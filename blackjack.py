@@ -131,11 +131,11 @@ class Croupier:
         if not self.is_out and not self.stopped:
             if self.hand.get_value() < 17:
                 print(f"Croupier pioche.")
+                game.give_card(self)
+                self.check(game)
                 if self.hand.l_cards != []:
                     print(f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}")
 
-                game.give_card(self)
-                self.check(game)
             else :
                 print("Le croupier s'arrete")
                 self.stopped = True
@@ -195,13 +195,14 @@ class Player:
         """Permet au bot de jouer (aléatoirement)"""
         if not self.is_out and not self.stopped:
             r=rd.randint(0,2)
-            print(r)
+            #print(r)
             if r > 0 or self.hand.l_cards==[]:
                 """66% de chance de tirer ou tire forcement si premier choix"""
                 game.give_card(self)
                 self.check(game)
             else:
                 self.stopped = True
+                
         
     
     def bot_play(self, game,choice:bool):
@@ -226,6 +227,8 @@ class Game:
     def __init__(self, players: list, deck: Deck):
         self.players = players
         self.deck = deck
+    
+
         
 
     def get_deck(self):
@@ -237,6 +240,15 @@ class Game:
         """
         player.hand.l_cards.append(self.deck.draw())
         player.hand.nb_cards += 1
+    
+    def number_player(self):
+        count=0
+        for player in self.players:
+            if not player.stopped and not player.is_out:
+                count+=1
+        return count
+
+
 
 
 
