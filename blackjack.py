@@ -199,7 +199,7 @@ class Player:
             if r > 0 or self.hand.l_cards==[]:
                 """66% de chance de tirer ou tire forcement si premier choix"""
                 game.give_card(self)
-                self.check()
+                self.check(game)
             else:
                 self.stopped = True
         
@@ -212,7 +212,7 @@ class Player:
         if not self.is_out and not self.stopped:
             if choice :
                 game.give_card(self)
-                self.check()
+                self.check(game)
             else:
                 self.stopped = True
 
@@ -297,8 +297,8 @@ def game(players: list):
 
 
 
-hector = Player(Hand(0, []), 0)
-gabriel = Player(Hand(0, []), 1)
-croupier = Croupier(Hand(0, []), 2)
+# hector = Player(Hand(0, []), 0)
+# gabriel = Player(Hand(0, []), 1)
+# croupier = Croupier(Hand(0, []), 2)
 
-game([hector, gabriel,croupier])
+# game([hector, gabriel,croupier])
