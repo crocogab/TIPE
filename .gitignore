@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+blackjack.csv
+blackjack_test.csv

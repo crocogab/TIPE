@@ -1,77 +1,107 @@
-from blackjack import *
+import tensorflow as tf
+
+column_names = ['total', 'croupier_value', 'should_take']
+
+feature_names = column_names[:-1]
+label_name = column_names[-1]
+
+class_names = ['Prendre','Laisser']
+
+batch_size = 32
+train_dataset = tf.data.experimental.make_csv_dataset(
+    './blackjack.csv',
+    batch_size,
+    column_names=column_names,
+    label_name=label_name,
+    num_epochs=1)
+
+def pack_features_vector(features, labels):
+  """Pack the features into a single array."""
+  features = tf.stack(list(features.values()), axis=1)
+  return features, labels
+
+train_dataset = train_dataset.map(pack_features_vector)
+
+features, labels = next(iter(train_dataset))
+
+model = tf.keras.Sequential([
+  tf.keras.layers.Dense(10, activation=tf.nn.relu, input_shape=(2,)),  # input shape required
+  tf.keras.layers.Dense(10, activation=tf.nn.relu),
+  tf.keras.layers.Dense(2)
+])
+
+predictions = model(features)
 
 
-def generate_game(players: list):
-    deck = make_deck(1)
-    deck.shuffle(100)
-    game = Game(players, deck)
-    for _ in range(50) :
-        for player in game.players:
-            if not player.stopped and not player.is_out:
-                if player.is_croupier:
-                    player.play(game)
-                    #player.check(game) 
-                else:
-                    player.rand_play(game)
-                    # player.check(game)
+loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+
+def loss(model, x, y, training):
+  # training=training is needed only if there are layers with different
+  # behavior during training versus inference (e.g. Dropout).
+  y_ = model(x, training=training)
+
+  return loss_object(y_true=y, y_pred=y_)
+
+
+l = loss(model, features, labels, training=False)
+
+def grad(model, inputs, targets):
+  with tf.GradientTape() as tape:
+    loss_value = loss(model, inputs, targets, training=True)
+  return loss_value, tape.gradient(loss_value, model.trainable_variables)
+
+optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
+
+train_loss_results = []
+train_accuracy_results = []
+
+num_epochs = 201
+
+for epoch in range(num_epochs):
+  epoch_loss_avg = tf.keras.metrics.Mean()
+  epoch_accuracy = tf.keras.metrics.SparseCategoricalAccuracy()
+
+  # Training loop - using batches of 32
+  for x, y in train_dataset:
+    # Optimize the model
+    loss_value, grads = grad(model, x, y)
+    optimizer.apply_gradients(zip(grads, model.trainable_variables))
+
+    # Track progress
+    epoch_loss_avg.update_state(loss_value)  # Add current batch loss
+    # Compare predicted label to actual label
+    # training=True is needed only if there are layers with different
+    # behavior during training versus inference (e.g. Dropout).
+    epoch_accuracy.update_state(y, model(x, training=True))
+
+  # End epoch
+  train_loss_results.append(epoch_loss_avg.result())
+  train_accuracy_results.append(epoch_accuracy.result())
+
+  if epoch % 2 == 0:
+    print("Epoch {:03d}: Loss: {:.3f}, Accuracy: {:.3%}".format(epoch,
+                                                                epoch_loss_avg.result(),
+                                                                epoch_accuracy.result()))
     
 
-    resultats=[] #dans l'ordre : id,is_croupier,total,is_out,is_winner
-    
-    croupier_is_out=True
-    
-    for player in players :
-        if not player.is_out:
-            if player.is_croupier :
-                croupier_is_out=False
-                croupier_hand_value=player.hand.get_value()
-    
-    if croupier_is_out:
-        for player in players:
-            if not player.is_out:
-                resultats.append([player.id,0,player.hand.get_value(),0,2])
-                
-    else:
-        for player in players :
-            
-            if not player.is_out and player.is_croupier:
-                resultats.append([player.id,1,player.hand.get_value(),0,0])
-            if not player.is_out and player.hand.get_value() > croupier_hand_value and not player.is_croupier:
-                resultats.append([player.id,0,player.hand.get_value(),0,2])
-            if not player.is_out and player.hand.get_value() == croupier_hand_value and not player.is_croupier:
-                resultats.append([player.id,0,player.hand.get_value(),0,1])
-    list_id=[elem[0] for elem in resultats]
-    for player in players:
-        if player.id not in list_id:
-            if player.is_croupier:
-                resultats.append([player.id,1,player.hand.get_value(),1,0])
-            else:
-                resultats.append([player.id,0,player.hand.get_value(),1,0])
-    for data in resultats:
-        data=data[1:]
-        
+test_dataset = tf.data.experimental.make_csv_dataset(
+    './blackjack_test.csv',
 
-    return resultats
+    batch_size,
+    column_names=column_names,
+    label_name='should_take',
+    num_epochs=1,
+    shuffle=False)
 
+test_dataset = test_dataset.map(pack_features_vector)
 
+test_accuracy = tf.keras.metrics.Accuracy()
 
-hector = Player(Hand(0, []), 0)
-gabriel = Player(Hand(0, []), 1)
-croupier = Croupier(Hand(0, []), 2)
-players = [hector, gabriel,croupier]
+for (x, y) in test_dataset:
+  # training=False is needed only if there are layers with different
+  # behavior during training versus inference (e.g. Dropout).
+  logits = model(x, training=False)
+  prediction = tf.argmax(logits, axis=1, output_type=tf.int32)
+  test_accuracy(prediction, y)
 
-print(generate_game(players))
-
-all_games=[]
-
-for i in range(100):
-    all_games.append(generate_game(players))
-
-print(all_games)
-        
-
-            
-
-
-    
-
+print("Test set accuracy: {:.3%}".format(test_accuracy.result()))
