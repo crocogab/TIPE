@@ -1,6 +1,9 @@
 import random as rd
-
+import colorama as col
 suits = ['club', 'diamond', 'heart', 'spade']
+color_list = [col.Fore.RED, col.Fore.BLUE, ]
+info = col.Fore.CYAN
+col.init()
 
 
 class Card:
@@ -132,12 +135,12 @@ class Croupier:
     def play(self, game):
         if not self.is_out and not self.stopped:
             if self.hand.get_value() < 17:
-                print(f"Croupier pioche.")
+                print(info, f"Croupier pioche.", col.Style.RESET_ALL)
                 game.give_card(self)
                 self.check(game)
                 if self.hand.l_cards != []:
                     print(
-                        f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}")
+                        info, f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}", col.Style.RESET_ALL)
 
             else:
                 print("Le croupier s'arrete")
@@ -158,6 +161,8 @@ class Player:
         self.is_out = False
         self.stopped = False
         self.is_croupier = False
+        self.color = color_list[rd.randint(0, len(color_list)-1)]
+        color_list.remove(self.color)
 
     def check(self, game):
         """
@@ -176,7 +181,8 @@ class Player:
         Fonction qui permet au joueur de jouer
         """
         if not self.is_out and not self.stopped:
-            print("Voulez vous prendre une carte (o/n)")
+            print(self.color, "Voulez vous prendre une carte (o/n)",
+                  col.Style.RESET_ALL, end='')
             choice = input()
             if choice == "o" or choice == "O":
                 game.give_card(self)
@@ -184,8 +190,9 @@ class Player:
             elif choice == "n" or choice == "N":
                 self.stopped = True
             else:
-                print("Choix invalide")
+                print(self.color, "Choix invalide", col.Style.RESET_ALL)
                 self.play(game)
+        print("\n", end='')
 
     def rand_play(self, game):
         """Permet au bot de jouer (aléatoirement)"""
