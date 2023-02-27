@@ -254,40 +254,41 @@ def game(players: list):
     while len([player for player in players if (not player.stopped and not player.is_out)]) > 1:
         for player in players:
             if not player.stopped and not player.is_out:
-                print(f"Joueur {player.id} : {player.hand}")
+                if not player.is_croupier:  # si le joueur est le croupier, on ne lui affiche pas sa main
+                    print(
+                        player.color, f"Joueur {player.id} : {player.hand}", col.Style.RESET_ALL)
                 player.play(game)
                 player.check(game)
-    print("Fin de la partie, gagnant(s) :")
+    print("Fin de la partie, Résultats :")
 
     croupier_is_out = True
 
-    for player in players:
-        if not player.is_out:
-            if player.is_croupier:
-                croupier_is_out = False
-                croupier_hand_value = player.hand.get_value()
-
-    if croupier_is_out:
-        for player in players:
-            if not player.is_out:
-                print(f"Joueur {player.id} : {player.hand} ")
+    if len([player for player in players if (not player.is_out and not player.is_croupier)]) == 0:
+        print("Tous les joueurs sont out, la banque gagne")
     else:
+        croupier = [player for player in players if player.is_croupier][0]
+        croupier_hand_value = croupier.hand.get_value()
+        print("Gagnant(s) :")
         for player in players:
+            if not player.is_out and not player.is_croupier:
+                if player.hand.get_value() > croupier_hand_value:
+                    print(
+                        f"Joueur {player.id} a gagné avec le jeu {player.hand} total = {player.hand.get_value()}")
+                elif player.hand.get_value() == croupier_hand_value:
+                    print(
+                        f"Joueur {player.id} a fait égalité avec le croupier avec le jeu jeu {player.hand} total = {player.hand.get_value()}")
+                elif not croupier.is_out:
+                    print(
+                        f"Joueur {player.id} a perdu contre le croupier avec le jeu {player.hand} total = {player.hand.get_value()}")
+    print(
+        f"Croupier avec le jeu : {croupier.hand} total = {croupier.hand.get_value()}")
+    for player in players:
+        if player.is_out:
+            print(
+                f"Joueur {player.id} a perdu (+21) {player.hand} total = {player.hand.get_value()}")
 
-            if not player.is_out and player.is_croupier:
-                print(
-                    f"Croupier avec le jeu : {player.hand} total = {player.hand.get_value()}")
 
-            if not player.is_out and player.hand.get_value() > croupier_hand_value and not player.is_croupier:
-                print(f"Joueur {player.id} : {player.hand} ")
-            if not player.is_out and player.hand.get_value() == croupier_hand_value and not player.is_croupier:
-
-                print(
-                    f"Joueur {player.id} est à égalité avec le croupier. Il récupère sa mise ")
-
-
-# hector = Player(Hand(0, []), 0)
-# gabriel = Player(Hand(0, []), 1)
-# croupier = Croupier(Hand(0, []), 2)
-
-# game([hector, gabriel,croupier])
+#hector = Player(Hand(0, []), 0)
+#gabriel = Player(Hand(0, []), 1)
+#croupier = Croupier(Hand(0, []), 2)
+#game([hector, gabriel, croupier])
