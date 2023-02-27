@@ -39,11 +39,10 @@ class Hand:
         for card in self.l_cards:
             string += str(card) + " "
         return string
-    
+
     def get_bot_hand(self):
         """Fonction permettant au bot d'obtenir la liste des cartes justes en int"""
         return [card.value for card in self.l_cards]
-
 
     def get_value(self):
         """
@@ -92,7 +91,7 @@ class Deck:
         """
         Retourne la carte du dessus du deck et la supprime du deck
         """
-        if self.nb_cards>=1: 
+        if self.nb_cards >= 1:
             """Evite de pop un deck vide"""
             card = self.l_cards[0]
             self.l_cards.pop(0)
@@ -101,18 +100,20 @@ class Deck:
         else:
             raise Exception("Deck is empty")
 
+
 class Croupier:
     """
     Classe de la croupier
     """
-    def __init__(self, hand,id:int):
+
+    def __init__(self, hand, id: int):
         self.id = id
         self.hand = hand
         self.is_out = False
         self.stopped = False
-        self.is_croupier= True
-    
-    def check(self,game):
+        self.is_croupier = True
+
+    def check(self, game):
         """
         Fonction qui verifie si le croupier est out et si il blackjack gagne
         """
@@ -120,14 +121,14 @@ class Croupier:
             print(f"{self.hand}\n")
             print(f"Croupier est out")
             self.is_out = True
-        
+
         elif self.hand.get_value() == 21:
             print("Blackjack du croupier ! La banque récupère la mise \n")
             self.stopped = True
             for player in game.players:
                 player.is_out = True
             self.is_out = False
-    
+
     def play(self, game):
         if not self.is_out and not self.stopped:
             if self.hand.get_value() < 17:
@@ -135,17 +136,12 @@ class Croupier:
                 game.give_card(self)
                 self.check(game)
                 if self.hand.l_cards != []:
-                    print(f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}")
+                    print(
+                        f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}")
 
-            else :
+            else:
                 print("Le croupier s'arrete")
                 self.stopped = True
-            
-
-
-
-
-        
 
 
 class Player:
@@ -161,9 +157,9 @@ class Player:
         self.hand = hand
         self.is_out = False
         self.stopped = False
-        self.is_croupier= False
+        self.is_croupier = False
 
-    def check(self,game):
+    def check(self, game):
         """
         Fonction qui verifie si le joueur est out
         """
@@ -190,47 +186,36 @@ class Player:
             else:
                 print("Choix invalide")
                 self.play(game)
-    
-    
+
     def rand_play(self, game):
         """Permet au bot de jouer (aléatoirement)"""
         if not self.is_out and not self.stopped:
-            r=rd.randint(0,2)
-            #print(r)
-            if r > 0 or self.hand.l_cards==[]:
+            r = rd.randint(0, 2)
+            # print(r)
+            if r > 0 or self.hand.l_cards == []:
                 """66% de chance de tirer ou tire forcement si premier choix"""
                 game.give_card(self)
                 self.check(game)
             else:
                 self.stopped = True
-                
-        
-    
-    def bot_play(self, game,choice:bool):
+
+    def bot_play(self, game, choice: bool):
         """Permet au bot de jouer (sans input)
         choice: true = prend une carte, false = rester
 
         """
         if not self.is_out and not self.stopped:
-            if choice :
+            if choice:
                 game.give_card(self)
                 self.check(game)
             else:
                 self.stopped = True
-
-
-            
-
-
 
 
 class Game:
     def __init__(self, players: list, deck: Deck):
         self.players = players
         self.deck = deck
-    
-
-        
 
     def get_deck(self):
         return self.deck
@@ -241,11 +226,6 @@ class Game:
         """
         player.hand.l_cards.append(self.deck.draw())
         player.hand.nb_cards += 1
-    
-    
-
-
-
 
 
 def make_deck(n: int) -> Deck:
@@ -271,38 +251,32 @@ def game(players: list):
                 player.play(game)
                 player.check(game)
     print("Fin de la partie, gagnant(s) :")
-    
-    croupier_is_out=True
-    
-    for player in players :
+
+    croupier_is_out = True
+
+    for player in players:
         if not player.is_out:
-            if player.is_croupier :
-                croupier_is_out=False
-                croupier_hand_value=player.hand.get_value()
-    
+            if player.is_croupier:
+                croupier_is_out = False
+                croupier_hand_value = player.hand.get_value()
+
     if croupier_is_out:
         for player in players:
             if not player.is_out:
                 print(f"Joueur {player.id} : {player.hand} ")
     else:
-        for player in players :
-            
+        for player in players:
+
             if not player.is_out and player.is_croupier:
-                print(f"Croupier avec le jeu : {player.hand} total = {player.hand.get_value()}")
-
-
+                print(
+                    f"Croupier avec le jeu : {player.hand} total = {player.hand.get_value()}")
 
             if not player.is_out and player.hand.get_value() > croupier_hand_value and not player.is_croupier:
                 print(f"Joueur {player.id} : {player.hand} ")
             if not player.is_out and player.hand.get_value() == croupier_hand_value and not player.is_croupier:
 
-                print(f"Joueur {player.id} est à égalité avec le croupier. Il récupère sa mise ")
-
-
-        
-            
-
-
+                print(
+                    f"Joueur {player.id} est à égalité avec le croupier. Il récupère sa mise ")
 
 
 # hector = Player(Hand(0, []), 0)
