@@ -290,7 +290,10 @@ def game(players: list):
                 f"Joueur {player.id} a perdu (+21) {player.hand} total = {player.hand.get_value()}")
 
 
-#hector = Player(Hand(0, []), 0)
-#gabriel = Player(Hand(0, []), 1)
-#croupier = Croupier(Hand(0, []), 2)
-#game([hector, gabriel, croupier])
+# if the program has "game" as an argument, run a game with 2 players
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "game":
+        hector = Player(Hand(0, []), 0)
+        gabriel = Player(Hand(0, []), 1)
+        croupier = Croupier(Hand(0, []), 2)
+        game([hector, gabriel, croupier])
