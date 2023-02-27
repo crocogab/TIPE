@@ -1,6 +1,7 @@
 import random as rd
+import sys
 import colorama as col
-suits = ['club', 'diamond', 'heart', 'spade']
+suits = ["club", "diamond", "heart", "spade"]
 color_list = [col.Fore.RED, col.Fore.BLUE, ]
 info = col.Fore.CYAN
 col.init()
@@ -145,6 +146,7 @@ class Croupier:
             else:
                 print("Le croupier s'arrete")
                 self.stopped = True
+        print("\n", end="")
 
 
 class Player:
@@ -182,7 +184,7 @@ class Player:
         """
         if not self.is_out and not self.stopped:
             print(self.color, "Voulez vous prendre une carte (o/n)",
-                  col.Style.RESET_ALL, end='')
+                  col.Style.RESET_ALL, end="")
             choice = input()
             if choice == "o" or choice == "O":
                 game.give_card(self)
@@ -192,7 +194,7 @@ class Player:
             else:
                 print(self.color, "Choix invalide", col.Style.RESET_ALL)
                 self.play(game)
-        print("\n", end='')
+        print("\n", end="")
 
     def rand_play(self, game):
         """Permet au bot de jouer (aléatoirement)"""
