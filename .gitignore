@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 blackjack.csv
 blackjack_test.csv
+
+.vscode

@@ -40,6 +40,8 @@ class Hand:
     def __str__(self):
         # l'ancienne version ne marchait pas (cards.l_cards) ça affichait l'adresse mémoire
         string = f"Nombre de cartes : {self.nb_cards} ,total = {self.get_value()} ,cartes = "
+        if self.nb_cards == 0:
+            return string + "None"
         for card in self.l_cards:
             string += str(card) + " "
         return string
@@ -175,7 +177,7 @@ class Player:
             print(f"Joueur {self.id} est out")
             self.is_out = True
         elif self.hand.get_value() == 21:
-            print("BLACKJACK !")
+            print(self.color, "BLACKJACK !", col.Style.RESET_ALL)
             self.stopped = True
 
     def play(self, game):
@@ -188,7 +190,6 @@ class Player:
             choice = input()
             if choice == "o" or choice == "O":
                 game.give_card(self)
-                self.check(game)
             elif choice == "n" or choice == "N":
                 self.stopped = True
             else:
@@ -253,7 +254,7 @@ def game(players: list):
     deck = make_deck(1)
     deck.shuffle(100)
     game = Game(players, deck)
-    while len([player for player in players if (not player.stopped and not player.is_out)]) > 1:
+    while len([player for player in players if (not player.stopped and not player.is_out)]) >= 1:
         for player in players:
             if not player.stopped and not player.is_out:
                 if not player.is_croupier:  # si le joueur est le croupier, on ne lui affiche pas sa main
@@ -282,8 +283,8 @@ def game(players: list):
                 elif not croupier.is_out:
                     print(
                         f"Joueur {player.id} a perdu contre le croupier avec le jeu {player.hand} total = {player.hand.get_value()}")
-    print(
-        f"Croupier avec le jeu : {croupier.hand} total = {croupier.hand.get_value()}")
+        print(
+            f"Croupier avec le jeu : {croupier.hand} total = {croupier.hand.get_value()}")
     for player in players:
         if player.is_out:
             print(
