@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring
 import random as rd
 import sys
 import colorama as col
@@ -147,7 +148,8 @@ class Croupier:
                 current_game.give_card(self)
                 if self.hand.l_cards != []:
                     print(
-                        INFO, f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}", col.Style.RESET_ALL)
+                        INFO, f"La premiere carte du jeu du croupier est \
+                        {self.hand.l_cards[0]}", col.Style.RESET_ALL)
             else:
                 print("Le croupier s'arrete")
                 self.stopped = True
@@ -204,9 +206,9 @@ class Player:
     def rand_play(self, current_game: "Game"):
         """Permet au bot de jouer (aléatoirement)"""
         if not self.is_out and not self.stopped:
-            r = rd.randint(0, 2)
+            random = rd.randint(0, 2)
             # print(r)
-            if r > 0 or self.hand.l_cards == []:
+            if random > 0 or self.hand.l_cards == []:
                 # 66% de chance de tirer ou tire forcement si premier choix
                 current_game.give_card(self)
                 self.check()
@@ -291,13 +293,16 @@ def game(players: list):
             if not player.is_out and not player.is_croupier:
                 if player.hand.get_value() > croupier_hand_value:
                     print(
-                        f"Joueur {player.id} a gagné avec le jeu {player.hand} total = {player.hand.get_value()}")
+                        f"Joueur {player.id} a gagné avec le jeu \
+                        {player.hand} total = {player.hand.get_value()}")
                 elif player.hand.get_value() == croupier_hand_value:
                     print(
-                        f"Joueur {player.id} a fait égalité avec le croupier avec le jeu jeu {player.hand} total = {player.hand.get_value()}")
+                        f"Joueur {player.id} a fait égalité avec le croupier avec le jeu\
+                             {player.hand} total = {player.hand.get_value()}")
                 elif not croupier.is_out:
                     print(
-                        f"Joueur {player.id} a perdu contre le croupier avec le jeu {player.hand} total = {player.hand.get_value()}")
+                        f"Joueur {player.id} a perdu contre le croupier avec le jeu\
+                             {player.hand} total = {player.hand.get_value()}")
         print(
             f"Croupier avec le jeu : {croupier.hand} total = {croupier.hand.get_value()}")
     for player in players:
