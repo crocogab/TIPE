@@ -8,7 +8,7 @@ INFO = col.Fore.CYAN
 col.init()
 
 
-class Card:
+class Card:  # pylint: disable=too-few-public-methods
     """
     Card class
     value [1,2,3,4,5,6,7,8,9,10,11,12,13] avec 11 = V , 12 = D , R = 13
@@ -194,9 +194,9 @@ class Player:
             print(self.color, "Voulez vous prendre une carte (o/n)",
                   col.Style.RESET_ALL, end="")
             choice = input()
-            if choice == "o" or choice == "O":
+            if choice in ["o", "O"]:
                 current_game.give_card(self)
-            elif choice == "n" or choice == "N":
+            elif choice in ["n", "N"]:
                 self.stopped = True
             else:
                 print(self.color, "Choix invalide", col.Style.RESET_ALL)
@@ -244,7 +244,7 @@ class Game:
         """
         return self.deck
 
-    def give_card(self, player: Player | Croupier):
+    def give_card(self, player):
         """
         Fonction qui donne une carte au joueur
         """
@@ -273,15 +273,14 @@ def game(players: list):
     my_game = Game(players, deck)
     while len([player for player in players if (not player.stopped and not player.is_out)]) >= 1:
         for player in players:
-            if not player.stopped and not player.is_out:
-                if not player.is_croupier:  # si c'est le croupier on affiche pas la main
-                    print(
-                        player.color, f"Joueur {player.id} : {player.hand}", col.Style.RESET_ALL)
+            if not player.stopped and not player.is_out and not player.is_croupier:
+                print(
+                    player.color, f"Joueur {player.id} : {player.hand}", col.Style.RESET_ALL)
                 player.play(my_game)
-                if not player.is_croupier:
-                    player.check()
-                else:
-                    player.check(my_game)
+                player.check()
+            else:
+                player.play(my_game)
+                player.check(my_game)
     print("Fin de la partie, Résultats :")
     if len([player for player in players if (not player.is_out and not player.is_croupier)]) == 0:
         print("Tous les joueurs sont out, la banque gagne")
@@ -303,15 +302,13 @@ def game(players: list):
                     print(
                         f"Joueur {player.id} a perdu contre le croupier avec le jeu\
                              {player.hand} total = {player.hand.get_value()}")
+            elif player.is_out:
+                print(
+                    f"Joueur {player.id} a perdu (+21)\
+                        {player.hand} total = {player.hand.get_value()}")
         print(
             f"Croupier avec le jeu : {croupier.hand} total = {croupier.hand.get_value()}")
-    for player in players:
-        if player.is_out:
-            print(
-                f"Joueur {player.id} a perdu (+21) {player.hand} total = {player.hand.get_value()}")
 
-
-# if the program has "game" as an argument, run a game with 2 players
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "game":
         hector = Player(Hand(0, []), 0)
