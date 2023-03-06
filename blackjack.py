@@ -19,7 +19,7 @@ class Card:  # pylint: disable=too-few-public-methods
         self.value = value
         self.suit = suit
 
-    def __str__(self):
+    def __str__(self):  # pylint: disable=inconsistent-return-statements
         if self.value > 10:
             if self.value == 11:
                 return f"Jake of {self.suit}"
@@ -116,7 +116,7 @@ class Croupier:
     """
 
     def __init__(self, hand: Hand, croupier_id: int):
-        self.id = croupier_id
+        self.id = croupier_id  # pylint: disable=invalid-name
         self.hand = hand
         self.is_out = False
         self.stopped = False
@@ -165,7 +165,7 @@ class Player:
     """
 
     def __init__(self, hand, player_id: int):
-        self.id = player_id
+        self.id = player_id  # pylint: disable=invalid-name
         self.hand = hand
         self.is_out = False
         self.stopped = False
@@ -308,6 +308,7 @@ def game(players: list):
                         {player.hand} total = {player.hand.get_value()}")
         print(
             f"Croupier avec le jeu : {croupier.hand} total = {croupier.hand.get_value()}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "game":
