@@ -3,7 +3,7 @@ import sys
 import colorama as col
 suits = ["club", "diamond", "heart", "spade"]
 color_list = [col.Fore.RED, col.Fore.BLUE, ]
-info = col.Fore.CYAN
+INFO = col.Fore.CYAN
 col.init()
 
 
@@ -14,7 +14,7 @@ class Card:
     suit [c,d,h,s] club,diamond,heart,spade (trefle, carreau,coeur,pique)
     """
 
-    def __init__(self, value, suit):
+    def __init__(self, value: int, suit: str):
         self.value = value
         self.suit = suit
 
@@ -52,7 +52,7 @@ class Hand:
 
     def get_value(self):
         """
-        calcul de la valeur de la main: si elle est > 21, alors on regarde si on a un as, si oui on le transforme en 1
+        Calcul de la valeur de la main si> 21, et si on a un as, on le transforme en 1
         """
         value = 0
         for card in self.l_cards:
@@ -69,6 +69,12 @@ class Hand:
 
 
 class Deck:
+    """
+    Classe du deck
+    self.nb_cards: nombre de cartes dans le deck
+    self.l_cards: liste des cartes dans le deck
+    """
+
     def __init__(self, nb_cards: int, l_cards: list):
         self.nb_cards = nb_cards
         self.l_cards = l_cards
@@ -84,12 +90,12 @@ class Deck:
         self.l_cards[j] = self.l_cards[i]
         self.l_cards[i] = temp
 
-    def shuffle(self, n: int):
+    def shuffle(self, shuffles: int):
         """
-        Mélange un deck n fois
+        Mélange un deck shuffles fois
         TODO: implementer un algo de mélangage plus réaliste
         """
-        for i in range(n):
+        for _ in range(shuffles):
             for j in range(self.nb_cards):
                 self.swap(j, rd.randint(0, self.nb_cards-1))
 
@@ -97,14 +103,10 @@ class Deck:
         """
         Retourne la carte du dessus du deck et la supprime du deck
         """
-        if self.nb_cards >= 1:
-            """Evite de pop un deck vide"""
-            card = self.l_cards[0]
-            self.l_cards.pop(0)
-            self.nb_cards -= 1
-            return card
-        else:
-            raise Exception("Deck is empty")
+        card = self.l_cards[0]
+        self.l_cards.pop(0)
+        self.nb_cards -= 1
+        return card
 
 
 class Croupier:
@@ -112,39 +114,40 @@ class Croupier:
     Classe de la croupier
     """
 
-    def __init__(self, hand, id: int):
-        self.id = id
+    def __init__(self, hand: Hand, croupier_id: int):
+        self.id = croupier_id
         self.hand = hand
         self.is_out = False
         self.stopped = False
         self.is_croupier = True
 
-    def check(self, game):
+    def check(self, current_game: "Game"):
         """
         Fonction qui verifie si le croupier est out et si il blackjack gagne
         """
         if self.hand.get_value() > 21:
             print(f"{self.hand}\n")
-            print(f"Croupier est out")
+            print("Croupier est out")
             self.is_out = True
 
         elif self.hand.get_value() == 21:
             print("Blackjack du croupier ! La banque récupère la mise \n")
             self.stopped = True
-            for player in game.players:
+            for player in current_game.players:
                 player.is_out = True
             self.is_out = False
 
-    def play(self, game):
+    def play(self, current_game: "Game"):
+        """
+        Fonction qui permet au croupier de jouer
+        """
         if not self.is_out and not self.stopped:
             if self.hand.get_value() < 17:
-                print(info, f"Croupier pioche.", col.Style.RESET_ALL)
-                game.give_card(self)
-                self.check(game)
+                print(INFO, "Croupier pioche.", col.Style.RESET_ALL)
+                current_game.give_card(self)
                 if self.hand.l_cards != []:
                     print(
-                        info, f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}", col.Style.RESET_ALL)
-
+                        INFO, f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}", col.Style.RESET_ALL)
             else:
                 print("Le croupier s'arrete")
                 self.stopped = True
@@ -156,11 +159,11 @@ class Player:
     Classe du joueur
     choix: true = prend une carte, false = rester
     is_out: true = le joueur est out(+21), false = le joueur est en jeu
-    stopped: true = le joueur a arreté de tirer des cartes, false = le joueur peut encore tirer des cartes
+    stopped: false si le joueur peut encore jouer
     """
 
-    def __init__(self, hand, id: int):
-        self.id = id
+    def __init__(self, hand, player_id: int):
+        self.id = player_id
         self.hand = hand
         self.is_out = False
         self.stopped = False
@@ -168,19 +171,20 @@ class Player:
         self.color = color_list[rd.randint(0, len(color_list)-1)]
         color_list.remove(self.color)
 
-    def check(self, game):
+    def check(self):
+        # current_game est nécéssaire pour le check du croupier
         """
         Fonction qui verifie si le joueur est out
         """
         if self.hand.get_value() > 21:
-            print(f"{self.hand}\n")
+            print(self.color+f"{self.hand}\n")
             print(f"Joueur {self.id} est out")
             self.is_out = True
         elif self.hand.get_value() == 21:
             print(self.color, "BLACKJACK !", col.Style.RESET_ALL)
             self.stopped = True
 
-    def play(self, game):
+    def play(self, current_game):
         """
         Fonction qui permet au joueur de jouer
         """
@@ -189,7 +193,7 @@ class Player:
                   col.Style.RESET_ALL, end="")
             choice = input()
             if choice == "o" or choice == "O":
-                game.give_card(self)
+                current_game.give_card(self)
             elif choice == "n" or choice == "N":
                 self.stopped = True
             else:
@@ -197,40 +201,48 @@ class Player:
                 self.play(game)
         print("\n", end="")
 
-    def rand_play(self, game):
+    def rand_play(self, current_game: "Game"):
         """Permet au bot de jouer (aléatoirement)"""
         if not self.is_out and not self.stopped:
             r = rd.randint(0, 2)
             # print(r)
             if r > 0 or self.hand.l_cards == []:
-                """66% de chance de tirer ou tire forcement si premier choix"""
-                game.give_card(self)
-                self.check(game)
+                # 66% de chance de tirer ou tire forcement si premier choix
+                current_game.give_card(self)
+                self.check()
             else:
                 self.stopped = True
 
-    def bot_play(self, game, choice: bool):
+    def bot_play(self, current_game: "Game", choice: bool):
         """Permet au bot de jouer (sans input)
         choice: true = prend une carte, false = rester
 
         """
         if not self.is_out and not self.stopped:
             if choice:
-                game.give_card(self)
-                self.check(game)
+                current_game.give_card(self)
+                self.check()
             else:
                 self.stopped = True
 
 
 class Game:
+    """
+    Classe du jeu
+    contient les joueurs et le deck
+    """
+
     def __init__(self, players: list, deck: Deck):
         self.players = players
         self.deck = deck
 
     def get_deck(self):
+        """
+        Fonction qui retourne le deck
+        """
         return self.deck
 
-    def give_card(self, player: Player):
+    def give_card(self, player: Player | Croupier):
         """
         Fonction qui donne une carte au joueur
         """
@@ -238,12 +250,12 @@ class Game:
         player.hand.nb_cards += 1
 
 
-def make_deck(n: int) -> Deck:
+def make_deck(deck_nbr: int) -> Deck:
     """
-    returns a deck of n*52 cards
+    returns a deck of deck_nbr*52 cards
     """
-    deck = Deck(n*52, [])
-    for i in range(n):
+    deck = Deck(deck_nbr*52, [])
+    for i in range(deck_nbr):
         for i in range(4):
             for j in range(1, 14):
                 deck.l_cards.append(Card(j, suits[i]))
@@ -251,26 +263,29 @@ def make_deck(n: int) -> Deck:
 
 
 def game(players: list):
+    """
+    Fonction principale de la partie
+    """
     deck = make_deck(1)
     deck.shuffle(100)
-    game = Game(players, deck)
+    my_game = Game(players, deck)
     while len([player for player in players if (not player.stopped and not player.is_out)]) >= 1:
         for player in players:
             if not player.stopped and not player.is_out:
-                if not player.is_croupier:  # si le joueur est le croupier, on ne lui affiche pas sa main
+                if not player.is_croupier:  # si c'est le croupier on affiche pas la main
                     print(
                         player.color, f"Joueur {player.id} : {player.hand}", col.Style.RESET_ALL)
-                player.play(game)
-                player.check(game)
+                player.play(my_game)
+                if not player.is_croupier:
+                    player.check()
+                else:
+                    player.check(my_game)
     print("Fin de la partie, Résultats :")
-
-    croupier_is_out = True
-
     if len([player for player in players if (not player.is_out and not player.is_croupier)]) == 0:
         print("Tous les joueurs sont out, la banque gagne")
     else:
-        croupier = [player for player in players if player.is_croupier][0]
-        croupier_hand_value = croupier.hand.get_value()
+        my_croupier = [player for player in players if player.is_croupier][0]
+        croupier_hand_value = my_croupier.hand.get_value()
         print("Gagnant(s) :")
         for player in players:
             if not player.is_out and not player.is_croupier:
