@@ -17,3 +17,5 @@ Puis le bot devra prendre la decision de :
 - prendre
 - rester
 
+Nombre de mains :
+- 7 (max)
