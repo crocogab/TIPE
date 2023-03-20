@@ -1,14 +1,12 @@
 import random as rd
-import sys
-    
-sys.path.insert(1, 'C:/Users/croco/Documents/GitHub/TIPE/')
-import blackjack as b
+
+
 
 
 def aux(tab,i,a):
     for n in range(10):
-        value=rd.randint(a)
-        value+=rd.random.choices([l for l in range(1,11)],weights=[10,10,10,10,10,10,10,10,10,30],k=1)[0]
+        value=a
+        value+=rd.choices([l for l in range(1,11)],weights=[10,10,10,10,10,10,10,10,10,30],k=1)[0]
         if value>21:
             value=0
         else:
@@ -57,6 +55,7 @@ class Individu:
     
 
 gen1= Individu(1,genes=Genes([]))
-gen1.genes.build_selection_tab()
+# gen1.genes.build_selection_tab()
+# gen1.genes.build_tab()
 gen1.genes.show()
 
