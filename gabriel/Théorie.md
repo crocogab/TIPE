@@ -42,9 +42,9 @@ Nous utiliserons dans cet étude le codage suivant :
   * L'as par l'entier $11$
   * L'absence de carte sera encodée par l'entier $0$ 
 
-* La main d'un joueur sera représentée par $ \{c_1,c_2,c_r\}$ avec $c_1$ la première carte du joueur , $c_2$ la seconde carte du joueur (valant 0 si le joueur n'a qu'une seule carte) et $c_r$ la carte visible du croupier.
+* La main d'un joueur sera représentée par $\{c_1,c_2,c_r\}$ avec $c_1$ la première carte du joueur , $c_2$ la seconde carte du joueur (valant 0 si le joueur n'a qu'une seule carte) et $c_r$ la carte visible du croupier.
 
-__Exemple__ : Si un joueur a dans sa main un 7 de trèfle ,ainsi qu'une dame de carreaux et que la carte du croupier est un as de trèfle alors la situation sera encodée par $ \{7,10,11\}$
+__Exemple__ : Si un joueur a dans sa main un 7 de trèfle ,ainsi qu'une dame de carreaux et que la carte du croupier est un as de trèfle alors la situation sera encodée par $\{7,10,11\}$
 
 
 
