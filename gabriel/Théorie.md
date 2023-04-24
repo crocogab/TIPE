@@ -42,9 +42,28 @@ Nous utiliserons dans cet étude le codage suivant :
   * L'as par l'entier $11$
   * L'absence de carte sera encodée par l'entier $0$ 
 
-* La main d'un joueur sera représentée par $\{c_1,c_2,c_r\}$ avec $c_1$ la première carte du joueur , $c_2$ la seconde carte du joueur (valant 0 si le joueur n'a qu'une seule carte) et $c_r$ la carte visible du croupier.
+* La main d'un joueur sera représentée par $\{c_1,c_2,...,c_7,c_r\}$ avec $c_1$ la première carte du joueur , $c_2$ la seconde carte du joueur (valant 0 si le joueur n'a qu'une seule carte) et $c_r$ la carte visible du croupier (on considérera qu'en pratique il est impossible d'obtenir plus que 7 cartes ).
 
-__Exemple__ : Si un joueur a dans sa main un 7 de trèfle ,ainsi qu'une dame de carreaux et que la carte du croupier est un as de trèfle alors la situation sera encodée par $\{7,10,11\}$
+__Exemple__ : Si un joueur a dans sa main un 7 de trèfle ,ainsi qu'une dame de carreaux et que la carte du croupier est un as de trèfle alors la situation sera encodée par $\{7,10,0,0,0,0,0,11\}$
+
+
+### Codage du chromosome
+
+Dans toute cette section on appelle $n$ la valeur totale de la main.
+
+Notre chromosome devra remprésenter toutes les possibilités de mains c'est à dire :
+* les mains ne comprenant pas l'as :
+  * le cas où $n \in  \llbracket 2;11\rrbracket$ (il s'agit d'un seul et unique cas car dans ce cas là on est sur de prendre).
+  * tous les cas où $n \in\llbracket 12;20\rrbracket $
+* les mains comprenant l'as (on nomme ici $p$ comme étant la valeur de la main sans l'as):
+  * tous les cas où $p \in\llbracket 2;7\rrbracket $
+  * le cas où $p \in  \llbracket 8;10\rrbracket$ (il s'agit d'un seul et unique cas car dans ce cas là on est sur de ne pas prendre).
+
+
+
+
+10*36
+
 
 
 
