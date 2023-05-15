@@ -44,7 +44,7 @@ Nous utiliserons dans cet étude le codage suivant :
 
 * La main d'un joueur sera représentée par $\{c_1,c_2,...,c_7,c_r\}$ avec $c_1$ la première carte du joueur , $c_2$ la seconde carte du joueur (valant 0 si le joueur n'a qu'une seule carte) et $c_r$ la carte visible du croupier (on considérera qu'en pratique il est impossible d'obtenir plus que 7 cartes ).
 
-__Exemple__ : Si un joueur a dans sa main un 7 de trèfle ,ainsi qu'une dame de carreaux et que la carte du croupier est un as de trèfle alors la situation sera encodée par $\{7,10,0,0,0,0,0,11,0\}$
+__Exemple__ : Si un joueur a dans sa main un 7 de trèfle ,ainsi qu'une dame de carreaux et que la carte du croupier est un as de trèfle alors la situation sera encodée par $\{7,10,0,0,0,0,0,11\}$
 
 
 ### Codage du chromosome
