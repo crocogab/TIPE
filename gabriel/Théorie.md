@@ -56,7 +56,7 @@ Notre chromosome devra remprésenter toutes les possibilités de mains c'est à 
   * le cas où $n \in  \llbracket 2;11\rrbracket$ (il s'agit d'un seul et unique cas car dans ce cas là on est sur de prendre).
   * tous les cas où $n \in\llbracket 12;20\rrbracket $
 * les mains comprenant l'as (on nomme ici $p$ comme étant la valeur de la main sans l'as):
-  * tous les cas où $p \in\llbracket 2;7\rrbracket $
+  * tous les cas où $p \in\llbracket 0;7\rrbracket $
   * le cas où $p \in  \llbracket 8;10\rrbracket$ (il s'agit d'un seul et unique cas car dans ce cas là on est sur de ne pas prendre).
 
 ### Codage de l'individu
