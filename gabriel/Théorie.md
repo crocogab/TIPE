@@ -59,10 +59,17 @@ Notre chromosome devra remprésenter toutes les possibilités de mains c'est à 
   * tous les cas où $p \in\llbracket 2;7\rrbracket $
   * le cas où $p \in  \llbracket 8;10\rrbracket$ (il s'agit d'un seul et unique cas car dans ce cas là on est sur de ne pas prendre).
 
+### Codage de l'individu
+
+Il faut maintenant encoder l'individu grâce aux conventions que l'on a définit ci-dessus.
+Un individu sera représenté par plusieurs paramtres :
+* id = un entier permettant d'indentifier l'individu
+* gen = un entier représentant la génération de l'individu
+* chromosome = un tableau de booléens : il constitue l'identité de l'individu et la décision de prendre ou de ne pas prendre ne dépend que de lui.
 
 
 
-10*36
+
 
 
 
