@@ -35,10 +35,10 @@ class Tree:
         """returns True if the node is empty"""
         return self.val == -1
 
-    def navigate(self, next: int):
+    def navigate(self, next_node: int):
         """returns the child with the value next if it exists, else returns an empty tree"""
         try:
-            return [child for child in self.children if child.val == next][0]
+            return [child for child in self.children if child.val == next_node][0]
         except IndexError:
             return Tree(-1, 0)
 
@@ -55,12 +55,11 @@ def create_game_tree(current: Tree, depth: int):
     maxdepth = 6
     if depth == maxdepth:
         return current
-    else:
-        for card in cards:
-            if current.total + card < 21:
-                current.children.append(Tree(card, current.total))
-            else:
-                current.virtualchildrenscount += 1
+    for card in cards:
+        if current.total + card < 21:
+            current.children.append(Tree(card, current.total))
+        else:
+            current.virtualchildrenscount += 1
     for child in current.children:
         create_game_tree(child, depth + 1)
     return current
@@ -72,14 +71,15 @@ MAINTREE = Tree(-1, 0)
 
 
 def main():
+    """main function"""
     timestamp = time.time()
     mytree = create_game_tree(MAINTREE, 0)
     mytree.survival_meth()
     print(time.time() - timestamp)
     while True:
-        next = input("Entrer la carte recue : ")
-        while not next.isdigit() or int(next) not in range(1, 11):
-            next = input("Entrée incorrecte : ")
+        next_card = input("Entrer la carte recue : ")
+        while not next_card.isdigit() or int(next_card) not in range(1, 11):
+            next_card = input("Entrée incorrecte : ")
         mytree = mytree.navigate(int(next))
         print(
             [child.val for child in mytree.children],
