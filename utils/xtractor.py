@@ -1,7 +1,8 @@
 from blackjack import *
 import multiprocessing
 import sys
-f = open('/dev/null', 'w')
+
+f = open("/dev/null", "w")
 sys.stdout = f
 
 
@@ -9,7 +10,7 @@ sys.stdout = f
 
 
 def generate_game(i):
-    """ doit generer des bouts de partie et dire si il doit piocher ou non
+    """doit generer des bouts de partie et dire si il doit piocher ou non
     ATTENTION LE CROUPIER EST LE PREMIER DE LA LISTE
 
     """
@@ -25,7 +26,12 @@ def generate_game(i):
     deck = make_deck(1)
     deck.shuffle(100)
     game = Game(players, deck)
-    while len([player for player in players if (not player.stopped and not player.is_out)]) > 1:
+    while (
+        len(
+            [player for player in players if (not player.stopped and not player.is_out)]
+        )
+        > 1
+    ):
         for player in players:
             if player.is_croupier:
                 player.play(game)
@@ -40,9 +46,10 @@ def generate_game(i):
 
 
 def write_data(file, data):
-    with open(file, 'w') as f:
+    with open(file, "w") as f:
         for i in data:
-            f.write(str(i[0]) + '\n')
+            f.write(str(i[0]) + "\n")
+
 
 # count the number of cpu and use mutiprocessing to generate_game faster
 
@@ -52,7 +59,7 @@ def run():
         # count the max number of process
         maxproc = multiprocessing.cpu_count()
         data = pool.map(generate_game, [i for i in range(maxproc)])
-        write_data('blackjack.csv', data)
+        write_data("blackjack.csv", data)
 
 
 run()

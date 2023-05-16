@@ -1,4 +1,3 @@
-# pylint: disable=missing-module-docstring
 import random as rd
 import sys
 import colorama as col

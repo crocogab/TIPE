@@ -2,38 +2,48 @@ import time
 
 SAFENESS = 0.5
 # SAFENESS represents the minimum survival rate of a node's children to be considered a good node
-# the rate is calculated by dividing the number of children with a value < 21 by the total number of children
+# the rate is calculated by dividing the number of children
+#  with a value < 21 by the total number of children
 
 
-class Tree():
+class Tree:
+    """
+    A tree is a node with a value and a list of children
+    """
+
     def __init__(self, value: int, total: int, children=None):
         self.val = value
         self.children = children or []
         self.total = self.val + total
-        # self.parent = None            parents should not be needed
-        # for child in self.children:
-        #     child.parent = self
+        self.virtualchildrenscount = 0
+        self.survival = 0
+        # virtual childrens are childrens that represents losing hands
+        # ( needed to calculate the survival rate but  faster to count instead of creating)
 
     def survival_meth(self):
+        """calculates the survival rate of a node"""
         try:
             self.survival = len(
-                [child for child in self.children if child.total < 21]) / len(self.children)  # there is a bug here. Children val will always be less than 21
+                [child for child in self.children if child.total < 21]
+            ) / (len(self.children) + self.virtualchildrenscount)
         except ZeroDivisionError:
             self.survival = 0
         for child in self.children:
             child.survival_meth()
 
     def is_empty(self):
+        """returns True if the node is empty"""
         return self.val == -1
 
     def navigate(self, next: int):
-        """renvoie le noeud enfant correspondant à next, ou l'arbre vide si il n'existe pas (défaite)"""
+        """returns the child with the value next if it exists, else returns an empty tree"""
         try:
             return [child for child in self.children if child.val == next][0]
         except IndexError:
-            return Tree(-1)
+            return Tree(-1, 0)
 
     def shouldtake(self):
+        """returns True if the node is safe enough to be considered a good node"""
         if self.children == []:
             return False
         return self.survival > SAFENESS
@@ -47,19 +57,21 @@ def create_game_tree(current: Tree, depth: int):
         return current
     else:
         for card in cards:
-            current.children.append(Tree(card, current.total))
-            # si la main dépasse 21, on n'a pas besoin de créer les enfants car ils sont tous perdants
+            if current.total + card < 21:
+                current.children.append(Tree(card, current.total))
+            else:
+                current.virtualchildrenscount += 1
     for child in current.children:
         create_game_tree(child, depth + 1)
     return current
 
-
     # MAINTREE est un arbre vide, il sera rempli par game_tree
+
+
 MAINTREE = Tree(-1, 0)
 
 
 def main():
-    global MAINTREE
     timestamp = time.time()
     mytree = create_game_tree(MAINTREE, 0)
     mytree.survival_meth()
@@ -69,7 +81,11 @@ def main():
         while not next.isdigit() or int(next) not in range(1, 11):
             next = input("Entrée incorrecte : ")
         mytree = mytree.navigate(int(next))
-        print([child.val for child in mytree.children])
+        print(
+            [child.val for child in mytree.children],
+            mytree.virtualchildrenscount,
+            " virtual childs",
+        )
         if mytree.shouldtake():
             print("Je prends")
             print(mytree.survival)
@@ -78,4 +94,5 @@ def main():
             print(mytree.survival)
 
 
-main()
+if __name__ == "__main__":
+    main()
