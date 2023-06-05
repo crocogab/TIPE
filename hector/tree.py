@@ -1,10 +1,11 @@
 import time
+import sys
+# TODO: Only generate the tree after the first two cards are drawn
 
 SAFENESS = 0.5
 # SAFENESS represents the minimum survival rate of a node's children to be considered a good node
 # the rate is calculated by dividing the number of children
 #  with a value < 21 by the total number of children
-
 
 class Tree:
     """
@@ -24,7 +25,7 @@ class Tree:
         """calculates the survival rate of a node"""
         try:
             self.survival = len(
-                [child for child in self.children if child.total < 21]
+                [child for child in self.children if child.total <= 21]
             ) / (len(self.children) + self.virtualchildrenscount)
         except ZeroDivisionError:
             self.survival = 0
@@ -38,9 +39,10 @@ class Tree:
     def navigate(self, next_node: int):
         """returns the child with the value next if it exists, else returns an empty tree"""
         try:
-            return [child for child in self.children if child.val == next_node][0]
-        except IndexError:
-            return Tree(-1, 0)
+            return [child for child in self.children if child.val == int(next_node)][0]
+        except (IndexError,ValueError):
+            print("Failed to find the next node.")
+            return Tree(-1, -1)
 
     def shouldtake(self):
         """returns True if the node is safe enough to be considered a good node"""
@@ -51,23 +53,21 @@ class Tree:
 
 def create_game_tree(current: Tree, depth: int):
     """creates a game tree with a maximum depth of 6"""
-    cards = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    cards = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
     maxdepth = 6
     if depth == maxdepth:
         return current
     for card in cards:
-        if current.total + card < 21:
-            current.children.append(Tree(card, current.total))
+        if current.total + card <= 21:
+            current.children.append(Tree(card, current.total)) # here, we pass current.total as the constructor handle the card's value
         else:
             current.virtualchildrenscount += 1
     for child in current.children:
         create_game_tree(child, depth + 1)
     return current
 
-    # MAINTREE est un arbre vide, il sera rempli par game_tree
 
-
-MAINTREE = Tree(-1, 0)
+MAINTREE = Tree(0, 0)
 
 
 def main():
@@ -80,19 +80,38 @@ def main():
         next_card = input("Entrer la carte recue : ")
         while not next_card.isdigit() or int(next_card) not in range(1, 11):
             next_card = input("Entrée incorrecte : ")
-        mytree = mytree.navigate(int(next))
+        mytree = mytree.navigate(int(next_card)) # not sure how it worked before
         print(
             [child.val for child in mytree.children],
             mytree.virtualchildrenscount,
             " virtual childs",
         )
         if mytree.shouldtake():
+            print(mytree.total)
             print("Je prends")
             print(mytree.survival)
         else:
+            print(mytree.total)
             print("Je ne prends pas")
             print(mytree.survival)
 
+def automate(card_string:str) -> bool:
+    """
+    take a list of cards as argument and return true if the player should take a card
+    """
+    card_string = card_string.split(",")
+    print("DEBUG: ",card_string)
+    mytree = create_game_tree(MAINTREE, 0)
+    mytree.survival_meth()
+    for card in card_string:
+        mytree = mytree.navigate(card)
+    return mytree.shouldtake()
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == "game":
+        main()
+    elif len(sys.argv) > 1:
+        automate(sys.argv[1].split(","))
+        print("DEBUG: ",sys.argv[1].split(","))
+    else:
+        automate([10])
