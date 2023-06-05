@@ -1,6 +1,8 @@
 import random
 import numpy as np
 
+PRECISION=10
+FAV_REUSSITE=1.3
 
 class Main():
     def __init__(self,cards) -> None:
@@ -20,7 +22,7 @@ class Main():
 
 class Individu():
     def __init__(self) -> None:
-        self.chromosomes=[0 for _ in range(19)] #10 premiers as = sans as # 11 à fin = as
+        self.chromosomes=[0 for _ in range(19)] #10 premiers = n'a pas d' as  ou as = valeur # 11 à fin = as
     
     def __str__(self) -> str:
         return f'Sans as = {self.chromosomes[:10]} | Avec as : {self.chromosomes[10:]}'
@@ -36,42 +38,110 @@ class Individu():
             if valeur>=0 and valeur<=7:
                 return self.chromosomes[11+valeur]
             else:
-                return self.chromosomes[10]
+                return self.chromosomes[18]
         else:
             if valeur>=2 and valeur <=11:
                 return self.chromosomes[0]
             else:
-                return self.chromosomes[0+(21-valeur)]
+                return self.chromosomes[0+(valeur-11)]
     # pour chaque situation tire 10 * une carte et compare le resultat en moyenne au resultat mis -> evalue la difference
     def survival_rate(self,possede_as:bool,valeur:int):
-        """ renvoie un taux entre 0 et 1 avec 1= best / max et 0 le pire """
+        """ renvoie un taux entre 0 et 1 avec 1= best / max et 0 le pire + si il a depasse """
         taux=0
         if possede_as:
-            tire=np.random.choice(np.arange(1, 11), p=([1/13 for _ in range(9)]+[4/13]))
-            if valeur+tire>21:
-                return (1.0,tire+valeur-9)
+            for _ in range(PRECISION):
+                if valeur+np.random.choice(np.arange(1, 11), p=([1/13 for _ in range(9)]+[4/13]))>21:
+                    taux+=1
 
-            else: 
-                return (1.0,tire+valeur)
+            return (1,taux>(PRECISION/1.5))
+            
         else:
-            for _ in range(5):
+            for _ in range(PRECISION):
                 if valeur + np.random.choice(np.arange(1, 11), p=([1/13 for _ in range(9)]+[4/13]))>21:
                     taux+=1
-            tire=random.randint(0,21-valeur)
-            return ((5-taux)/5,tire)
+            #print('[DEBUG ACTU]',(PRECISION-taux)/5)
+            return ((PRECISION-taux)/5,taux>(PRECISION/1.5))
     
     def fitness(self,possede_as,valeur):
         surv=self.survival_rate(possede_as,valeur)
-        return (surv[0] *(surv[1]))/21
+        #return (surv[0] *(surv[1]))/21
+        if surv[1]:
+            a=-(surv[0]/2.1)
+            #print(a)
+        else:
+            a=((surv[0]*FAV_REUSSITE)/2.1)
+            #print(a)
 
-
+        return a
+    
+    def fitness2(self):
+        fitness_c=0
+        for i in range(19):
+            if self.chromosomes[i]==1:
+                if i ==0 :
+                    avg=(sum([self.fitness(False,c) for c in range(2,12)]))/10
+                    fitness_c+=avg
+                    
+                elif i<10:
+                    
+                    fitness_c+=self.fitness(False,i+11)
+                elif i==10:
+                    fitness_c+=self.fitness(False,20)
+                elif i<17:
+                    fitness_c+=self.fitness(True,i)
+                else:
+                    avg=(sum([self.fitness(True,c) for c in range(18,21)]))/3
+                    fitness_c+=avg
+        #print('[DEBUG] :',fitness_c)
+        return (fitness_c)/19
 
 i1=Individu()
 i1.chromosomes[10]=1
 
-print(i1)
-print(i1.value(True,0))
 
-print(i1.fitness(False,13))
+# print(i1)
+# print(i1.chromosomes[10])
 
+
+# print(i1.fitness(False,13))
+# print(i1.fitness2())
 # def fitness(adn):
+
+moyenne1=0
+moyenne2=0
+moyenne3=0
+
+i1.chromosomes[0]=1
+i1.chromosomes[18]=1
+
+
+
+for i in range(18):
+    i1.chromosomes[i]=1
+
+for i in range(100):
+    moyenne1+=i1.fitness2()
+
+
+
+
+
+i1.chromosomes[10]=0
+i1.chromosomes[18]=0
+i1.chromosomes[9]=0
+i1.chromosomes[8]=0
+
+for i in range(100):
+    moyenne2+=i1.fitness2()
+
+i1.chromosomes[1]=1
+i1.chromosomes[2]=1
+i1.chromosomes[11]=1
+i1.chromosomes[12]=1
+
+for i in range(100):
+    moyenne3+=i1.fitness2()
+
+print(f'[COMPARAISON] moyenne_1: {moyenne1/100} | moyenne_2: {moyenne2/100} | moyenne_3: {moyenne3/100}')
+
+#Probleme dans survival rate je pense
