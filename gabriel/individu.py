@@ -25,7 +25,7 @@ class Individu():
         self.chromosomes = [0 for _ in range(19)]
 
     def __str__(self) -> str:
-        return f'Sans as = {self.chromosomes[:10]} | Avec as : {self.chromosomes[10:]}'
+        return f'Sans as = {self.chromosomes[:10]} | Avec as : {self.chromosomes[10:18]} | Courtier : {self.chromosomes[19]}'
 
     # pour chaque situation tire 10 * une carte et compare le resultat en moyenne au resultat mis -> evalue la difference
     def survival_rate(self, possede_as: bool, valeur: int):
@@ -40,26 +40,24 @@ class Individu():
                 else:
                     taux += (21-total)*FAV_REUSSITE
 
-            # return (1, taux > (PRECISION/1.5))
-            return (taux, False)
+            # return (1, taux > (PRECISION/1.5)
+            print(f"[DEBUG TAUX] : {taux/PRECISION} valeur : {valeur}")
+            return (taux/PRECISION)
         else:
             for _ in range(PRECISION):
-                if valeur + np.random.choice(np.arange(1, 11), p=([1/13 for _ in range(9)]+[4/13])) > 21:
-                    taux += 1
-            #print('[DEBUG ACTU]',(PRECISION-taux)/5)
-            return ((PRECISION-taux)/5, taux > (PRECISION/1.5))
+                total = valeur + np.random.choice(np.arange(1, 11), p=(
+                    [1/13 for _ in range(9)]+[4/13])) 
+                if total > 21:
+                    taux -= (total-21)
+                else:
+                    taux += (21-total)*FAV_REUSSITE
+            print('[DEBUG ACTU]',taux/PRECISION)
+            return (taux/PRECISION)
 
     def fitness(self, possede_as, valeur):
         surv = self.survival_rate(possede_as, valeur)
-        # return (surv[0] *(surv[1]))/21
-        if surv[1]:
-            a = -(surv[0]/2.1)
-            # print(a)
-        else:
-            a = ((surv[0]*FAV_REUSSITE)/2.1)
-            # print(a)
 
-        return a
+        return surv/2.1
 
     def fitness2(self):
         fitness_c = 0
@@ -113,17 +111,18 @@ for i in range(100):
 
 
 i1.chromosomes[10] = 0
-i1.chromosomes[18] = 0
+i1.chromosomes[18] = 10
 i1.chromosomes[9] = 0
 i1.chromosomes[8] = 0
 
 for i in range(100):
     moyenne2 += i1.fitness2()
 
-i1.chromosomes[1] = 1
-i1.chromosomes[2] = 1
-i1.chromosomes[11] = 1
-i1.chromosomes[12] = 1
+i1.chromosomes[17] = 0
+i1.chromosomes[16] = 0
+
+i1.chromosomes[15] = 0
+
 
 for i in range(100):
     moyenne3 += i1.fitness2()
