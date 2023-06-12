@@ -1,8 +1,9 @@
 import time
 import sys
+import logging
 # TODO: Only generate the tree after the first two cards are drawn
 
-SAFENESS = 0.5
+#SAFENESS = 0.5
 # SAFENESS represents the minimum survival rate of a node's children to be considered a good node
 # the rate is calculated by dividing the number of children
 #  with a value < 21 by the total number of children
@@ -41,14 +42,14 @@ class Tree:
         try:
             return [child for child in self.children if child.val == int(next_node)][0]
         except (IndexError,ValueError):
-            print("Failed to find the next node.")
+            logging.warning(f"Invalid child value {next_node}, childs are %s", [child.val for child in self.children])
             return Tree(-1, -1)
 
-    def shouldtake(self):
+    def shouldtake(self,safeness:float):
         """returns True if the node is safe enough to be considered a good node"""
         if self.children == []:
             return False
-        return self.survival > SAFENESS
+        return self.survival > safeness
 
 
 def create_game_tree(current: Tree, depth: int):
@@ -95,23 +96,25 @@ def main():
             print("Je ne prends pas")
             print(mytree.survival)
 
-def automate(card_string:str) -> bool:
+def automate(card_string:str,safeness:float) -> tuple:
     """
     take a list of cards as argument and return true if the player should take a card
     """
     card_string = card_string.split(",")
-    print("DEBUG: ",card_string)
+    logging.debug("card_tab: %s",card_string)
     mytree = create_game_tree(MAINTREE, 0)
     mytree.survival_meth()
     for card in card_string:
         mytree = mytree.navigate(card)
-    return mytree.shouldtake()
+    return mytree.shouldtake(safeness),mytree.survival
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "game":
         main()
     elif len(sys.argv) > 1:
-        automate(sys.argv[1].split(","))
-        print("DEBUG: ",sys.argv[1].split(","))
+        automate(sys.argv[1].split(","),float(sys.argv[2]))
+        logging.debug("sys.argv[1]: %s",sys.argv[1])
     else:
-        automate([10])
+        automate([10],0.5)

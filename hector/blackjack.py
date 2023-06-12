@@ -18,6 +18,12 @@ class Card:  # pylint: disable=too-few-public-methods
         self.value = value
         self.suit = suit
 
+    def real_value(self):
+        """retourne la valeur réelle de la carte"""
+        if self.value > 10:
+            return 10
+        return self.value
+
     def __str__(self):  # pylint: disable=inconsistent-return-statements
         if self.value > 10:
             if self.value == 11:
@@ -44,6 +50,12 @@ class Hand:
             return string + "None"
         for card in self.l_cards:
             string += str(card) + " "
+        return string
+    
+    def get_string(self):
+        string = ""
+        for card in self.l_cards:
+            string += str(card.real_value()) + ","
         return string
 
     def get_bot_hand(self):
