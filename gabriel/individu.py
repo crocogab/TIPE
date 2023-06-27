@@ -46,12 +46,12 @@ class Individu():
         else:
             for _ in range(PRECISION):
                 total = valeur + np.random.choice(np.arange(1, 11), p=(
-                    [1/13 for _ in range(9)]+[4/13])) 
+                    [1/13 for _ in range(9)]+[4/13]))
                 if total > 21:
                     taux -= (total-21)
                 else:
                     taux += (21-total)*FAV_REUSSITE
-            print('[DEBUG ACTU]',taux/PRECISION)
+            print('[DEBUG ACTU]', taux/PRECISION)
             return (taux/PRECISION)
 
     def fitness(self, possede_as, valeur):

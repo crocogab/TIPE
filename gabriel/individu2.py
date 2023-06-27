@@ -6,18 +6,8 @@ import matplotlib.pyplot as plt
 
 
 PRECISION = 10
-FAV_REUSSITE = 1.5
-PUNITION = 1.2
-
-
-class Main():
-    def __init__(self, cards) -> None:
-        self.cards = cards
-        self.possede_as = 11 in self.cards[:7]
-        self.total = sum(cards[:7])
-
-    def __str__(self) -> str:
-        return f'Cartes = {self.cards} | As ? ={self.possede_as} | Total ={self.total}'
+FAV_REUSSITE = 3.5
+PUNITION = 3.5
 
 
 # main1=Main((7,10,0,0,0,0,0,11))
@@ -27,13 +17,21 @@ class Main():
 class Individu():
     def __init__(self) -> None:
         # 10 premiers = n'a pas d' as  ou as = valeur # 11 à fin = as
-        self.chromosomes = [0 for _ in range(19)]
+        self.chromosomes = [0 for _ in range(20)]
 
     def __str__(self) -> str:
-        return f'Sans as = {self.chromosomes[:10]} | Avec as : {self.chromosomes[10:18]} | Courtier : {self.chromosomes[18]}'
+        return f"""        ---------------------------[ Croupier {self.chromosomes[19]}]--------------------------------- \n 
+        Sans as : [2-11]| [12]| [13]| [14]| [15]| [16]| [17]| [18]| [19]| [20]\n 
+                  [{self.chromosomes[0]}]   | [{self.chromosomes[1]}] | [{self.chromosomes[2]}] | [{self.chromosomes[3]}] | [{self.chromosomes[4]}] | [{self.chromosomes[5]}] | [{self.chromosomes[6]}] | [{self.chromosomes[7]}] | [{self.chromosomes[8]}] | [{self.chromosomes[9]}]\n
+        ---------------------------------------------------------------------- 
+        \n        Avec as : [10]| [11]| [12]| [13]| [14]| [15]| [16]| [17]| [18-20]
+        \n                  [{self.chromosomes[10]}] | [{self.chromosomes[11]}] | [{self.chromosomes[12]}] | [{self.chromosomes[13]}] | [{self.chromosomes[14]}] | [{self.chromosomes[15]}] | [{self.chromosomes[16]}] | [{self.chromosomes[17]}] | [{self.chromosomes[18]}]
+        \n        ----------------------------------------------------------------------"""
+
+        # return f'Sans as = {self.chromosomes[:10]} | Avec as : {self.chromosomes[10:18]} | Courtier : {self.chromosomes[18]}'
 
     def random_init(self):
-        for i in range(18):
+        for i in range(19):
             self.chromosomes[i] = random.randint(0, 1)
 
     def survival_rate(self, possede_as, valeur):
@@ -83,26 +81,25 @@ class Individu():
 
     def fitness(self):
         fitness_c = 0
-        for i in range(19):
+        for i in range(20):
             if self.chromosomes[i] == 1:
                 if i == 0:
                     avg = (sum([self.survival_rate(False, c)
-                           for c in range(2, 12)]))/10
+                           for c in range(2, 12)]))/11
                     fitness_c += avg
 
                 elif i < 10:
 
                     fitness_c += self.survival_rate(False, i+11)
-                elif i == 10:
-                    fitness_c += self.survival_rate(False, 20)
-                elif i < 17:
+
+                elif i < 18:
                     fitness_c += self.survival_rate(True, i)
                 else:
                     avg = (sum([self.survival_rate(True, c)
-                           for c in range(18, 21)]))/3
+                           for c in range(18, 20)]))/3
                     fitness_c += avg
         # print('[DEBUG] :',fitness_c)
-        return (fitness_c)/19
+        return (fitness_c)/20
 
 
 def croisement(i1: Individu, i2: Individu):
@@ -151,7 +148,7 @@ for i in range(18):
 
 
 i1.chromosomes[10] = 0
-i1.chromosomes[18] = 2
+i1.chromosomes[19] = 2
 i1.chromosomes[9] = 0
 i1.chromosomes[8] = 0
 
@@ -187,70 +184,7 @@ i1.chromosomes[15] = 0
 # print(f'score i3 : {i3.fitness()}')
 # print(i4)
 # print(f'score i3 : {i3.fitness()}')
-
-
-def first_generation():
-    i1 = Individu()
-    i2 = Individu()
-    i3 = Individu()
-    i4 = Individu()
-
-    i1.chromosomes[18] = 2
-    i2.chromosomes[18] = 2
-    i3.chromosomes[18] = 2
-    i4.chromosomes[18] = 2
-
-    i1.random_init()
-    i2.random_init()
-    i3.random_init()
-    i4.random_init()
-
-    fitness1_d = i1.fitness()
-    fitness2_d = i2.fitness()
-    fitness3_d = i3.fitness()
-    fitness4_d = i4.fitness()
-
-    for i in range(100):
-        fitness1 = i1.fitness()
-        fitness2 = i2.fitness()
-        fitness3 = i3.fitness()
-        fitness4 = i4.fitness()
-        print(f'score i1  gen{i} : {i1.fitness()}')
-        print(f'score i2  gen{i} : {i2.fitness()}')
-        print(f'score i3  gen{i} : {i3.fitness()}')
-        print(f'score i4  gen{i} : {i4.fitness()} \n')
-
-        if max(fitness2, fitness1) == fitness1:
-            i1_p = mutation(i1)
-            if i1_p.fitness() > fitness1:
-                i1 = i1_p
-        else:
-            i2_p = mutation(i2)
-            if i2_p.fitness() > fitness2:
-                i2 = i2_p
-
-        i34_p = croisement(i3, i4)
-        if i34_p[0].fitness() > fitness3:
-            i3 = i34_p[0]
-        if i34_p[1].fitness() > fitness4:
-            i4 = i34_p[1]
-
-        print(f'score i1  gen{i} fin: {i1.fitness()}')
-        print(f'score i2  gen{i} fin: {i2.fitness()}')
-        print(f'score i3  gen{i} fin: {i3.fitness()}')
-        print(f'score i4  gen{i} fin: {i4.fitness()}\n')
-
-    print(f'difference i1 : {i1.fitness() - fitness1_d}')
-    print(f'difference i2 : {i2.fitness() - fitness2_d}')
-    print(f'difference i3 : {i3.fitness() - fitness3_d}')
-    print(f'difference i4 : {i4.fitness() - fitness4_d}')
-    print(i1)
-    print(i2)
-    print(i3)
-    print(i4)
-
-
-# first_generation()
+# print(i1)
 
 
 def generation():
@@ -258,7 +192,7 @@ def generation():
 
     for _ in range(10):
         i1 = Individu()
-        i1.chromosomes[18] = 2
+        i1.chromosomes[19] = 7
         i1.random_init()
         list_individus.append(i1)
 
@@ -274,11 +208,11 @@ def generation():
         if mut.fitness() > list_individus[liste[0][1]].fitness():
             list_individus[liste[0][1]] = mut
         coupl_crois = croisement(
-            list_individus[liste[1][1]], list_individus[liste[2][1]])
-        if coupl_crois[0].fitness() > list_individus[liste[1][1]].fitness():
-            list_individus[liste[1][1]] = coupl_crois[0]
-        if coupl_crois[1].fitness() > list_individus[liste[2][1]].fitness():
-            list_individus[liste[2][1]] = coupl_crois[1]
+            list_individus[liste[3][1]], list_individus[liste[4][1]])
+        if coupl_crois[0].fitness() > list_individus[liste[3][1]].fitness():
+            list_individus[liste[3][1]] = coupl_crois[0]
+        if coupl_crois[1].fitness() > list_individus[liste[4][1]].fitness():
+            list_individus[liste[4][1]] = coupl_crois[1]
         for i in range(10):
             if i not in [liste[0][1], liste[1][1], liste[2][1], liste[3][1], liste[4][1]]:
                 list_individus[i].random_init()
@@ -286,9 +220,12 @@ def generation():
         fitness_list.sort()
         return fitness_list[5:]
 
-    for _ in range(50):
+    for _ in range(100):
         list_conserve = new_generation(list_conserve)
         print(list_conserve)
+
+    for elem in list_conserve:
+        print(list_individus[elem[1]])
 
 
 # ce qu'il faut faire -> ameliorer generation (plus d'indivius et plus de generations)
