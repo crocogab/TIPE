@@ -43,7 +43,8 @@ class Tree:
         try:
             return [child for child in self.children if child.val == int(next_node)][0]
         except (IndexError,ValueError):
-            logging.warning(f"Invalid child value {next_node}, childs are %s", [child.val for child in self.children])
+            logging.warning(f"Invalid child value {next_node}, childs are %s", \
+                            [child.val for child in self.children])
             return Tree(-1, -1)
 
     def shouldtake(self,safeness:float):
@@ -61,7 +62,8 @@ def create_game_tree(current: Tree, depth: int):
         return current
     for card in cards:
         if current.total + card <= 21:
-            current.children.append(Tree(card, current.total)) # here, we pass current.total as the constructor handle the card's value
+            current.children.append(Tree(card, current.total))
+            # here, we pass current.total as the constructor handle the card's value
         else:
             current.virtualchildrenscount += 1
     for child in current.children:

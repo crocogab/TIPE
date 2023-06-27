@@ -52,8 +52,9 @@ class Hand:
         for card in self.l_cards:
             string += str(card) + " "
         return string
-    
+
     def get_string(self):
+        """Fonction permettant d'obtenir la liste des cartes sous forme de string"""
         string = ""
         for card in self.l_cards:
             string += str(card.real_value()) + ","
@@ -155,12 +156,13 @@ class Croupier:
                     print(INFO, "Croupier pioche.", col.Style.RESET_ALL)
                 current_game.give_card(self)
                 if self.hand.l_cards != [] and len(sys.argv) != 0 and not HEADLESS:
-                    print(INFO, f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}", col.Style.RESET_ALL)
+                    print(INFO, f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}",\
+                          col.Style.RESET_ALL)
             elif not HEADLESS:
                 print("Le croupier s'arrete")
                 self.stopped = True
-        if not HEADLESS: 
-         print("\n", end="")
+        if not HEADLESS:
+            print("\n", end="")
 
 
 class Player:
@@ -321,7 +323,7 @@ def game(players: list):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "game" or 1==1:
+    if len(sys.argv) > 1 and sys.argv[1] == "game":
         HEADLESS = False
         hector = Player(Hand(0, []), 0)
         gabriel = Player(Hand(0, []), 1)
