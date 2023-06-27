@@ -5,6 +5,7 @@ suits = ["club", "diamond", "heart", "spade"]
 color_list = [col.Fore.RED, col.Fore.BLUE, ]
 INFO = col.Fore.CYAN
 col.init()
+HEADLESS = True
 
 
 class Card:  # pylint: disable=too-few-public-methods
@@ -94,22 +95,16 @@ class Deck:
     def __str__(self):
         return f"Nombre de cartes [PILE] : {self.nb_cards} , cartes = {self.l_cards}"
 
-    def swap(self, i: int, j: int):
-        """
-        Fonction qui permute deux cartes dans le deck
-        """
-        temp = self.l_cards[j]
-        self.l_cards[j] = self.l_cards[i]
-        self.l_cards[i] = temp
-
     def shuffle(self, shuffles: int):
         """
         Mélange un deck shuffles fois
-        TODO: implementer un algo de mélangage plus réaliste
         """
+        lcard=[]
         for _ in range(shuffles):
-            for j in range(self.nb_cards):
-                self.swap(j, rd.randint(0, self.nb_cards-1))
+            for _ in range(self.nb_cards):
+                lcard.append(self.l_cards.pop(rd.randint(0, self.nb_cards - 1)))
+                self.nb_cards -= 1
+        self.l_cards = lcard
 
     def draw(self) -> Card:
         """
@@ -153,18 +148,19 @@ class Croupier:
         """
         Fonction qui permet au croupier de jouer
         """
+        self.check(current_game)
         if not self.is_out and not self.stopped:
             if self.hand.get_value() < 17:
-                print(INFO, "Croupier pioche.", col.Style.RESET_ALL)
+                if not HEADLESS:
+                    print(INFO, "Croupier pioche.", col.Style.RESET_ALL)
                 current_game.give_card(self)
-                if self.hand.l_cards != []:
-                    print(
-                        INFO, f"La premiere carte du jeu du croupier est \
-                        {self.hand.l_cards[0]}", col.Style.RESET_ALL)
-            else:
+                if self.hand.l_cards != [] and len(sys.argv) != 0 and not HEADLESS:
+                    print(INFO, f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}", col.Style.RESET_ALL)
+            elif not HEADLESS:
                 print("Le croupier s'arrete")
                 self.stopped = True
-        print("\n", end="")
+        if not HEADLESS: 
+         print("\n", end="")
 
 
 class Player:
@@ -181,8 +177,9 @@ class Player:
         self.is_out = False
         self.stopped = False
         self.is_croupier = False
-        self.color = color_list[rd.randint(0, len(color_list)-1)]
-        color_list.remove(self.color)
+        self.color = color_list[rd.randint(0, len(color_list)-1)] if not HEADLESS else ""
+        if color_list.__contains__(self.color):
+            color_list.remove(self.color)
 
     def check(self):
         # current_game est nécéssaire pour le check du croupier
@@ -190,11 +187,13 @@ class Player:
         Fonction qui verifie si le joueur est out
         """
         if self.hand.get_value() > 21:
-            print(self.color+f"{self.hand}\n")
-            print(f"Joueur {self.id} est out")
+            if not HEADLESS:
+                print(self.color+f"{self.hand}\n")
+                print(f"Joueur {self.id} est out")
             self.is_out = True
         elif self.hand.get_value() == 21:
-            print(self.color, "BLACKJACK !", col.Style.RESET_ALL)
+            if not HEADLESS:
+                print(self.color, "BLACKJACK !", col.Style.RESET_ALL)
             self.stopped = True
 
     def play(self, current_game):
@@ -322,7 +321,8 @@ def game(players: list):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "game":
+    if len(sys.argv) > 1 and sys.argv[1] == "game" or 1==1:
+        HEADLESS = False
         hector = Player(Hand(0, []), 0)
         gabriel = Player(Hand(0, []), 1)
         croupier = Croupier(Hand(0, []), 2)

@@ -2,6 +2,7 @@ import time
 import sys
 import logging
 # TODO: Only generate the tree after the first two cards are drawn
+# TODO: check if lost before navigating
 
 #SAFENESS = 0.5
 # SAFENESS represents the minimum survival rate of a node's children to be considered a good node
