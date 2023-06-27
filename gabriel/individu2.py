@@ -1,7 +1,7 @@
 import random
 import numpy as np
+import string
 
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 
@@ -101,7 +101,7 @@ class Individu():
                     avg = (sum([self.survival_rate(True, c)
                            for c in range(18, 21)]))/3
                     fitness_c += avg
-        #print('[DEBUG] :',fitness_c)
+        # print('[DEBUG] :',fitness_c)
         return (fitness_c)/19
 
 
@@ -250,8 +250,47 @@ def first_generation():
     print(i4)
 
 
-first_generation()
+# first_generation()
+
+
+def generation():
+    list_individus = []
+
+    for _ in range(10):
+        i1 = Individu()
+        i1.chromosomes[18] = 2
+        i1.random_init()
+        list_individus.append(i1)
+
+    fitness_list = [(list_individus[i].fitness(), i) for i in range(10)]
+    fitness_list.sort()
+
+    list_conserve = fitness_list[5:]
+    print(list_conserve)
+
+    def new_generation(liste):
+
+        mut = mutation(list_individus[liste[0][1]])
+        if mut.fitness() > list_individus[liste[0][1]].fitness():
+            list_individus[liste[0][1]] = mut
+        coupl_crois = croisement(
+            list_individus[liste[1][1]], list_individus[liste[2][1]])
+        if coupl_crois[0].fitness() > list_individus[liste[1][1]].fitness():
+            list_individus[liste[1][1]] = coupl_crois[0]
+        if coupl_crois[1].fitness() > list_individus[liste[2][1]].fitness():
+            list_individus[liste[2][1]] = coupl_crois[1]
+        for i in range(10):
+            if i not in [liste[0][1], liste[1][1], liste[2][1], liste[3][1], liste[4][1]]:
+                list_individus[i].random_init()
+        fitness_list = [(list_individus[i].fitness(), i) for i in range(10)]
+        fitness_list.sort()
+        return fitness_list[5:]
+
+    for _ in range(50):
+        list_conserve = new_generation(list_conserve)
+        print(list_conserve)
 
 
 # ce qu'il faut faire -> ameliorer generation (plus d'indivius et plus de generations)
 # avoir un meilleur rendu pour l'affichage
+generation()
