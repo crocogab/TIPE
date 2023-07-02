@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 
 
 PRECISION = 10
-FAV_REUSSITE = 1.1
-PUNITION = 1.5
 
 
 # main1=Main((7,10,0,0,0,0,0,11))
@@ -65,47 +63,35 @@ class Individu():
                         else:
                             if total_croupier < valeur:
                                 points -= (valeur-total_croupier)/PRECISION
-        else:
+        else:  # peut juste etre cette partie à améliorer
             for _ in range(PRECISION):
+
                 total = valeur + np.random.choice(np.arange(1, 11), p=(
                     [1/13 for _ in range(9)]+[4/13]))
                 total_croupier = self.chromosomes[19] + np.random.choice(np.arange(1, 11), p=(
                     [1/13 for _ in range(9)]+[4/13]))
+
                 if total <= 21:
                     if tire:
-
                         points += (22-total)/PRECISION
                     else:
                         points -= (22-total)/PRECISION
-                else:
-                    if valeur >= total_croupier:
-                        if not tire:
-                            points += (valeur-total_croupier)/PRECISION
-                        else:
-                            if total <= 21:
-                                if tire:
-                                    points += (22-total)/PRECISION
-                                else:
-                                    points -= (22-total)/PRECISION
+                elif valeur > total_croupier:
+                    if not tire:
+                        points += (valeur-total_croupier)/PRECISION
+                    elif total <= 21 and tire:
+                        points += (22-total)/PRECISION
                     else:
-                        if not tire:
-                            points -= (total_croupier-valeur)/PRECISION
-                        else:
-                            if total <= 21:
-                                points += (22-total)/PRECISION
-                            else:
-                                if total-10 >= total_croupier:
-                                    if tire:
-                                        points += (22-total)/PRECISION
-                                    else:
-                                        points -= (22-total)/PRECISION
-                                else:
-                                    if tire:
-                                        points -= (total_croupier -
-                                                   total+10)/PRECISION
-                                    else:
-                                        points += (total_croupier -
-                                                   total+10)/PRECISION
+                        points -= (22-total)/PRECISION
+                elif valeur < total_croupier:
+                    if not tire:
+                        points -= (total_croupier-valeur)/PRECISION
+                    elif total <= 21:
+                        points += (22-total)/PRECISION
+                    elif total-10 >= total_croupier:
+                        points += (22-total)/PRECISION
+                    else:
+                        points -= (22-total)/PRECISION
 
         return points
 
@@ -277,7 +263,7 @@ list_individus = []
 
 for _ in range(20):
     i1 = Individu()
-    i1.chromosomes[19] = 9
+    i1.chromosomes[19] = 6
     i1.random_init()
     list_individus.append(i1)
 
