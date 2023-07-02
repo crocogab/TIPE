@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 
 PRECISION = 10
-FAV_REUSSITE = 3.5
-PUNITION = 3.5
+FAV_REUSSITE = 1.1
+PUNITION = 1.5
 
 
 # main1=Main((7,10,0,0,0,0,0,11))
@@ -20,10 +20,10 @@ class Individu():
         self.chromosomes = [0 for _ in range(20)]
 
     def __str__(self) -> str:
-        return f"""        ---------------------------[ Croupier {self.chromosomes[19]}]--------------------------------- \n 
-        Sans as : [2-11]| [12]| [13]| [14]| [15]| [16]| [17]| [18]| [19]| [20]\n 
+        return f"""        ---------------------------[ Croupier {self.chromosomes[19]}]--------------------------------- \n
+        Sans as : [2-11]| [12]| [13]| [14]| [15]| [16]| [17]| [18]| [19]| [20]\n
                   [{self.chromosomes[0]}]   | [{self.chromosomes[1]}] | [{self.chromosomes[2]}] | [{self.chromosomes[3]}] | [{self.chromosomes[4]}] | [{self.chromosomes[5]}] | [{self.chromosomes[6]}] | [{self.chromosomes[7]}] | [{self.chromosomes[8]}] | [{self.chromosomes[9]}]\n
-        ---------------------------------------------------------------------- 
+        ----------------------------------------------------------------------
         \n        Avec as : [10]| [11]| [12]| [13]| [14]| [15]| [16]| [17]| [18-20]
         \n                  [{self.chromosomes[10]}] | [{self.chromosomes[11]}] | [{self.chromosomes[12]}] | [{self.chromosomes[13]}] | [{self.chromosomes[14]}] | [{self.chromosomes[15]}] | [{self.chromosomes[16]}] | [{self.chromosomes[17]}] | [{self.chromosomes[18]}]
         \n        ----------------------------------------------------------------------"""
@@ -34,70 +34,117 @@ class Individu():
         for i in range(19):
             self.chromosomes[i] = random.randint(0, 1)
 
-    def survival_rate(self, possede_as, valeur):
+    def survival_rate(self, possede_as: bool, valeur: int, tire: bool):
         points = 0
-        if not possede_as:
 
+        if not possede_as:
             for _ in range(PRECISION):
                 total = valeur + np.random.choice(np.arange(1, 11), p=(
                     [1/13 for _ in range(9)]+[4/13]))
-                total_croupier = self.chromosomes[18] + np.random.choice(np.arange(1, 11), p=(
+                total_croupier = self.chromosomes[19] + np.random.choice(np.arange(1, 11), p=(
                     [1/13 for _ in range(9)]+[4/13]))
-                if total > 21:
-                    points -= (total-21)*PUNITION
-                    if total_croupier > 21:
-                        points += (total_croupier-21)
+                if total <= 21:
+                    if tire:
+                        # jusqu'à 22 car on doit recevoir des points meme si on fait 21
+                        points += (22-total)/PRECISION
                     else:
-                        if total_croupier > valeur:
-                            points += (21-total_croupier)
-                        else:
-                            points -= (valeur-total_croupier)
+                        points -= (22-total)/PRECISION
                 else:
-                    if total_croupier < 21 and total_croupier > valeur:  # valorisation car choix risque mais necessaire
-                        points += (21-total)*FAV_REUSSITE
-                    else:
-                        points += (21-total)
+                    if not tire:
+                        points += (total-21)/PRECISION
+                        if total_croupier <= 21 and total_croupier > valeur:
+                            points -= (22-total_croupier)/PRECISION
+                        else:
+                            if total_croupier < valeur:
+                                points += (valeur-total_croupier)/PRECISION
 
+                    else:
+                        points -= (total-21)/PRECISION
+                        if total_croupier <= 21 and total_croupier > valeur:
+                            points += (22-total_croupier)/PRECISION
+                        else:
+                            if total_croupier < valeur:
+                                points -= (valeur-total_croupier)/PRECISION
         else:
             for _ in range(PRECISION):
                 total = valeur + np.random.choice(np.arange(1, 11), p=(
                     [1/13 for _ in range(9)]+[4/13]))
-                total_croupier = self.chromosomes[18] + np.random.choice(np.arange(1, 11), p=(
+                total_croupier = self.chromosomes[19] + np.random.choice(np.arange(1, 11), p=(
                     [1/13 for _ in range(9)]+[4/13]))
-                if total > 21:
-                    total -= 9
-                if valeur > total_croupier:
-                    if total > total_croupier:
-                        points += (total-total_croupier)
-                    else:
-                        points -= (total_croupier-total)*PUNITION
-                else:
-                    if total > total_croupier:
-                        points += (total-total_croupier)*FAV_REUSSITE
-                    else:
-                        points -= (total_croupier-total)
+                if total <= 21:
+                    if tire:
 
-        return points/PRECISION
+                        points += (22-total)/PRECISION
+                    else:
+                        points -= (22-total)/PRECISION
+                else:
+                    if valeur >= total_croupier:
+                        if not tire:
+                            points += (valeur-total_croupier)/PRECISION
+                        else:
+                            if total <= 21:
+                                if tire:
+                                    points += (22-total)/PRECISION
+                                else:
+                                    points -= (22-total)/PRECISION
+                    else:
+                        if not tire:
+                            points -= (total_croupier-valeur)/PRECISION
+                        else:
+                            if total <= 21:
+                                points += (22-total)/PRECISION
+                            else:
+                                if total-10 >= total_croupier:
+                                    if tire:
+                                        points += (22-total)/PRECISION
+                                    else:
+                                        points -= (22-total)/PRECISION
+                                else:
+                                    if tire:
+                                        points -= (total_croupier -
+                                                   total+10)/PRECISION
+                                    else:
+                                        points += (total_croupier -
+                                                   total+10)/PRECISION
+
+        return points
 
     def fitness(self):
         fitness_c = 0
-        for i in range(20):
-            if self.chromosomes[i] == 1:
-                if i == 0:
-                    avg = (sum([self.survival_rate(False, c)
+        for i in range(19):
+
+            if i == 0:
+                if self.chromosomes[i] == 1:
+                    avg = (sum([self.survival_rate(False, c, True)
+                           for c in range(2, 12)]))/11
+                    fitness_c += avg
+                else:
+                    avg = (sum([self.survival_rate(False, c, False)
                            for c in range(2, 12)]))/11
                     fitness_c += avg
 
-                elif i < 10:
-
-                    fitness_c += self.survival_rate(False, i+11)
-
-                elif i < 18:
-                    fitness_c += self.survival_rate(True, i)
+            elif i < 10:
+                if self.chromosomes[i] == 1:
+                    fitness_c += self.survival_rate(False, i+11, True)
                 else:
-                    avg = (sum([self.survival_rate(True, c)
+                    fitness_c += self.survival_rate(False, i+11, False)
+
+            elif i < 18:
+                if self.chromosomes[i] == 1:
+                    fitness_c += self.survival_rate(True, i, True)
+                else:
+                    fitness_c += self.survival_rate(True, i, False)
+
+            else:
+                if self.chromosomes[i] == 1:
+                    avg = (sum([self.survival_rate(True, c, True)
                            for c in range(18, 20)]))/3
                     fitness_c += avg
+                else:
+                    avg = (sum([self.survival_rate(True, c, False)
+                           for c in range(18, 20)]))/3
+                    fitness_c += avg
+
         # print('[DEBUG] :',fitness_c)
         return (fitness_c)/20
 
@@ -166,7 +213,7 @@ i1.chromosomes[15] = 0
 # for i in range(100):
 #     moyenne3 += i1.fitness()
 
-# i1.show()
+
 # print(
 #     f'[COMPARAISON] moyenne_1: {moyenne1/100} | moyenne_2: {moyenne2/100} | moyenne_3: {moyenne3/100}')
 
@@ -187,47 +234,54 @@ i1.chromosomes[15] = 0
 # print(i1)
 
 
-def generation():
-    list_individus = []
+def generation(list_individus, nb_individus, iterations_demande):
+    """ nb d'invidus doit être pair"""
+    if iterations_demande == 0:
+        for elem in list_individus:
+            print(f'fitness : {elem.fitness()}\n{elem}\n')
 
-    for _ in range(10):
-        i1 = Individu()
-        i1.chromosomes[19] = 7
-        i1.random_init()
-        list_individus.append(i1)
+    else:
 
-    fitness_list = [(list_individus[i].fitness(), i) for i in range(10)]
-    fitness_list.sort()
-
-    list_conserve = fitness_list[5:]
-    print(list_conserve)
-
-    def new_generation(liste):
-
-        mut = mutation(list_individus[liste[0][1]])
-        if mut.fitness() > list_individus[liste[0][1]].fitness():
-            list_individus[liste[0][1]] = mut
-        coupl_crois = croisement(
-            list_individus[liste[3][1]], list_individus[liste[4][1]])
-        if coupl_crois[0].fitness() > list_individus[liste[3][1]].fitness():
-            list_individus[liste[3][1]] = coupl_crois[0]
-        if coupl_crois[1].fitness() > list_individus[liste[4][1]].fitness():
-            list_individus[liste[4][1]] = coupl_crois[1]
-        for i in range(10):
-            if i not in [liste[0][1], liste[1][1], liste[2][1], liste[3][1], liste[4][1]]:
-                list_individus[i].random_init()
-        fitness_list = [(list_individus[i].fitness(), i) for i in range(10)]
+        fitness_list = [(list_individus[i].fitness(), i)
+                        for i in range(nb_individus)]
         fitness_list.sort()
-        return fitness_list[5:]
+        print(fitness_list)
 
-    for _ in range(100):
-        list_conserve = new_generation(list_conserve)
-        print(list_conserve)
+        list_conserv = []
 
-    for elem in list_conserve:
-        print(list_individus[elem[1]])
+        # garde la moitié des meilleurs individus
+        for i in range(nb_individus//2):
+            if fitness_list[i][0] > fitness_list[i+nb_individus//2][0]:
+                list_conserv.append(
+                    list_individus[fitness_list[i][1]])
+
+            else:
+                list_conserv.append(
+                    list_individus[fitness_list[i+nb_individus//2][1]])
+
+        for i in range(nb_individus//4):
+            i1, i2 = croisement(
+                list_conserv[i], list_conserv[i+1])
+            list_conserv.append(i1)
+            list_conserv.append(i2)
+
+        for i in range(nb_individus//2):
+            list_conserv.append(mutation(list_conserv[i]))
+        list_conserv.sort(key=lambda x: x.fitness(), reverse=True)
+
+        generation(list_conserv[:len(list_individus) -
+                                len(list_conserv)], nb_individus, iterations_demande-1)
 
 
-# ce qu'il faut faire -> ameliorer generation (plus d'indivius et plus de generations)
-# avoir un meilleur rendu pour l'affichage
-generation()
+list_individus = []
+
+for _ in range(20):
+    i1 = Individu()
+    i1.chromosomes[19] = 9
+    i1.random_init()
+    list_individus.append(i1)
+
+generation(list_individus, 20, 60)
+
+
+# ce qu'il faut faire -> ameliorer generation / fonction fitness pour avoir meilleurs resultats
