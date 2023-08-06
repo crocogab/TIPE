@@ -1,9 +1,5 @@
 import random
 import numpy as np
-import string
-
-import matplotlib.pyplot as plt
-
 
 PRECISION = 10
 
