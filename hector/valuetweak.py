@@ -25,7 +25,7 @@ def simple(safeness:float)->bool:
         mytree.navigate(player.hand.l_cards[-1].real_value())
         my_game.give_card(croup)
     logging.debug("player hand: %s",player.hand)
-    while ((not player.is_out and not player.stopped) or (not croup.is_out and (not croup.stopped))):
+    while ((not player.is_out and not player.stopped) or (not croup.is_out and not croup.stopped)):
         if not player.is_out and not player.stopped:
             cards_string = player.hand.get_string()
             cards_string = cards_string[:-1]
@@ -37,9 +37,9 @@ def simple(safeness:float)->bool:
                 player.check()
             else:
                 player.stopped = True
-                logging.info("STOP! %s cards with a value of %s. Surival rate: %s",\
-                             len(player.hand.l_cards),player.hand.get_value(),\
-                                automate(cards_string,safeness,mytree)[1]) #TODO change this
+                #logging.info("STOP! %s cards with a value of %s. Surival rate: %s",\
+                             #len(player.hand.l_cards),player.hand.get_value(),\
+                                #automate(cards_string,safeness,mytree)[1]) #TODO change this
         if not croup.is_out and not croup.stopped:
             croup.play(my_game)
     logging.info("\033[31m"+"--------------------")
@@ -70,7 +70,7 @@ def wrapper():
     Wrapper for the simple function
     """
     n = int(sys.argv[1]) #pylint: disable=invalid-name
-    step = 0.1
+    step = 0.125
     safeness = 0.5
     while safeness < 1:
         for _ in range(n):
