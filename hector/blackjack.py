@@ -134,12 +134,14 @@ class Croupier:
         Fonction qui verifie si le croupier est out et si il blackjack gagne
         """
         if self.hand.get_value() > 21:
-            print(f"{self.hand}\n")
-            print("Croupier est out")
+            if not HEADLESS:
+                print(f"{self.hand}\n")
+                print("Croupier est out")
             self.is_out = True
 
         elif self.hand.get_value() == 21:
-            print("Blackjack du croupier ! La banque récupère la mise \n")
+            if not HEADLESS:
+                print("Blackjack du croupier ! La banque récupère la mise \n")
             self.stopped = True
             for player in current_game.players:
                 player.is_out = True
@@ -160,9 +162,10 @@ class Croupier:
                           col.Style.RESET_ALL)
             elif not HEADLESS:
                 print("Le croupier s'arrete")
-                self.stopped = True
+            self.stopped = True
         if not HEADLESS:
             print("\n", end="")
+        self.check(current_game)
 
 
 class Player:

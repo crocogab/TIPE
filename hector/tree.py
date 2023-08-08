@@ -71,13 +71,10 @@ def create_game_tree(current: Tree, depth: int):
     return current
 
 
-MAINTREE = Tree(0, 0)
-
-
 def main():
     """main function"""
     timestamp = time.time()
-    mytree = create_game_tree(MAINTREE, 0)
+    mytree = create_game_tree(Tree(0,0), 0)
     mytree.survival_meth()
     print(time.time() - timestamp)
     while True:
@@ -105,7 +102,7 @@ def automate(card_string:str,safeness:float) -> tuple:
     """
     card_string = card_string.split(",")
     logging.debug("card_tab: %s",card_string)
-    mytree = create_game_tree(MAINTREE, 0)
+    mytree = create_game_tree(Tree(0,0), 0)
     mytree.survival_meth()
     for card in card_string:
         mytree = mytree.navigate(card)
