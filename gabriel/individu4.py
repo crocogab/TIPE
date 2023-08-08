@@ -1,9 +1,10 @@
-import random
+import random 
 import numpy as np
-import matplotlib.pyplot as plt
 
 PRECISION = 40
 NB_ITERATIONS=100
+NB_INDIVIDUS=32 #multiple de 32
+MAIN_CROUPIER=6 #valeur de la main du croupier
 
 class Individu():
     def __init__(self) -> None:
@@ -51,20 +52,6 @@ class Individu():
             else:
                 total+=card
         return total
-    
-    def analyse_croupier(self,c_hand,j_hand):
-        """ dis is un joueur devrait tirer ou pas en fonction de sa main et de celle du croupier"""
-        total=0
-        for _ in range(5):
-            score=c_hand
-            score.append(np.random.choice(np.arange(1, 11), p=( 
-                    [1/13 for _ in range(9)]+[4/13])))
-            if self.calculate_val(score)>self.calculate_val(j_hand):
-                total+=1
-        return total/5
-
-
-            
     
     def play(self):
         """Joue un 1v1 contre le croupier en fonction de ses chromosomes et voit si il gagne"""
@@ -128,152 +115,104 @@ class Individu():
             if self.play():
                 count+=1
         return count/PRECISION
-    
+
+def mutation(i1: Individu):
+    """Mutation d'un individu -> 1 bit aléatoire"""
+    index1 = random.randint(0, 18)
+    i1_p = i1
+    i1_p.chromosomes[index1] = 1-i1.chromosomes[index1]
+    return i1_p    
 
 def croisement(i1: Individu, i2: Individu):
     """Croisement de deux individus -> découpe en 2 sous-chaines pour l'instant"""
     i3 = Individu()
+    i4=Individu()
     
-    index1 = random.randint(0, 17)
-    
-    i3.chromosomes = i1.chromosomes[:index1] + i2.chromosomes[index1:]
-    
-    return i3
-
-
-def mutation(i1: Individu):
-    """Mutation d'un individu -> 3 bit aléatoire"""
     index1 = random.randint(0, 17)
     index2 = random.randint(0, 17)
-    index3 = random.randint(0, 17)
-    i1_p = i1
-    i1_p.chromosomes[index1] = 1-i1.chromosomes[index1]
-    i1_p.chromosomes[index2] = 1-i1.chromosomes[index2]
-    i1_p.chromosomes[index3] = 1-i1.chromosomes[index3]
-    return i1_p
+    
+    i3.chromosomes = i1.chromosomes[:index1] + i2.chromosomes[index1:]
+    i4.chromosomes = i1.chromosomes[:index2] + i2.chromosomes[index2:]
+    
+    return i3,i4
 
-
-test_graph_x=[]
-test_graph_y=[]
-
-def generation(list_individus: list, nb_individus: int, nb_generations: int,croupier_hand:int):
-    """nb individus multiple de 8 et plus grand que 16"""
-    assert nb_individus % 8 == 0 and nb_individus > 16 , "nombre de individus doit etre un multiple de 8 et plus grand que 16"
-
-    if nb_generations==0:
+def generation(list_individus,gen_nb):
+    
+    if gen_nb==NB_ITERATIONS:
         list_individus.sort(key=lambda x: x.evaluate())
         for individu in list_individus:
             print(f'evaluate : {individu.evaluate()}\n{individu}\n') #plus forcement le meme evaluate qu'avant (random) donc le meme sens
-        
     else:
         list_conserv=[]
-        list_individus.sort(key=lambda x: x.evaluate()) #trie la liste 1er = plus nul -> dernier = meilleur
-        for i in range(nb_individus//2):
-            """ on enleve juste la pire moitié"""
+        for _ in range(NB_INDIVIDUS//2):
+            """ moitié est conservée"""
+            list_conserv.append(list_individus[0])
+            list_individus.pop(0) 
+
+        for _ in range(NB_INDIVIDUS//4):
+            """ un quart est muté"""
+            list_conserv.append(mutation(list_individus[0]))
             list_individus.pop(0)
         
-        for i in range(nb_individus//8):
-            list_conserv.append(mutation(list_individus.pop(0)))
+        for _ in range(NB_INDIVIDUS//8):
+            i1,i2=croisement(list_individus[0],list_individus[NB_INDIVIDUS//8])
+            list_conserv.append(i1)
+            list_conserv.append(i2)
+            list_conserv.pop(0)
+            list_conserv.pop(NB_INDIVIDUS//8)
         
-        for i in range(nb_individus//8):
-            list_conserv.append(list_individus.pop(0))
-        
-        
-        
-        for i in range(nb_individus//8):
-            i1=croisement(list_individus[i], list_individus[i+1])
-            if i1.evaluate()>list_individus[i].evaluate():
-                list_conserv.append(i1)
-            else:
-                list_conserv.append(list_individus[i])
-            
-            list_individus.pop(0)
-            
-        for i in range(nb_individus//2):
-                i1 = Individu()
-                i1.random_init()
-                i1.chromosomes[19] = croupier_hand
-
-                list_conserv.append(i1) 
-        
-        
-        for i in range(nb_individus//8):
-            list_conserv.append(list_individus[i])
-
         score=0
-        for elem in list_conserv[nb_individus-4:]:
-            score+=elem.evaluate()
+        association=[]
+
+        for id in list_conserv:
+            debut=score
+            score+=id.evaluate()
+            fin=score
+            association.append((id,debut,fin))
+        
+        liste_finale=[]
+
+        for _ in range(NB_INDIVIDUS):
+            a=random.uniform(0,1)
+            liste_finale.append(find(association,a*score))
+        
+        print(f'Generation : {gen_nb} | score : {score}')
+        generation(liste_finale,gen_nb+1)
             
-        test_graph_x.append(NB_ITERATIONS-nb_generations)
-        test_graph_y.append(score/4)
-        
-       
-        
-        
-        
-    
-        print(f'Generations restantes : {nb_generations} | Score moyen 4 last : {score/4} \n')
-        
-        generation(list_conserv, nb_individus, nb_generations-1,croupier_hand)
-            
+
 
         
-        
+def find(liste,val):
+    for elem in liste:
+        if elem[2]>=val and elem[1]<=val:
+            return elem[0]
 
 
 
     
+def generate():
+    list_individus=[]
+    for _ in range(NB_INDIVIDUS):
+        i1=Individu()
+        i1.random_init()
+        i1.chromosomes[19]=MAIN_CROUPIER
+        list_individus.append(i1)
+    generation(list_individus,2)
 
-# def generation(list_individus, nb_individus, iterations_demande):
-#     """ nb d'invidus doit être pair"""
-#     if iterations_demande == 0:
-#         for elem in list_individus:
-#             print(f'evaluate : {elem.evaluate()}\n{elem}\n')
+#generate()
 
-#     else:
+i1=Individu()
+i1.chromosomes[19]=6
+i1.chromosomes[0]=1
+i1.chromosomes[10]=1
+i1.chromosomes[11]=1
+i1.chromosomes[12]=1
+i1.chromosomes[13]=1
+i1.chromosomes[14]=1
+i1.chromosomes[15]=1
+i1.chromosomes[16]=1
+i1.chromosomes[17]=1
 
-#         evaluate_list = [(list_individus[i].evaluate(), i)
-#                         for i in range(nb_individus)]
-#         evaluate_list.sort()
-#         print(evaluate_list)
+print(i1.evaluate())
 
-#         list_conserv = []
-
-#         # garde la moitié des meilleurs individus
-#         for i in range(nb_individus//2):
-#             if evaluate_list[i][0] > evaluate_list[i+nb_individus//2][0]:
-#                 list_conserv.append(
-#                     list_individus[evaluate_list[i][1]])
-
-#             else:
-#                 list_conserv.append(
-#                     list_individus[evaluate_list[i+nb_individus//2][1]])
-
-#         for i in range(nb_individus//4):
-#             i1, i2 = croisement(
-#                 list_conserv[i], list_conserv[i+1])
-#             list_conserv.append(i1)
-#             list_conserv.append(i2)
-
-#         for i in range(nb_individus//2):
-#             list_conserv.append(mutation(list_conserv[i+(nb_individus//2)]))
-#         list_conserv.sort(key=lambda x: x.evaluate(), reverse=True)
-
-#         generation(list_conserv[:len(list_individus) -
-#                                 len(list_conserv)], nb_individus, iterations_demande-1)
-
-list_individus = []
-
-for _ in range(64):
-    i1 = Individu()
-    i1.random_init()
-    i1.chromosomes[19] = 6
-    
-    list_individus.append(i1)
-
-generation(list_individus, 64, NB_ITERATIONS,6)
-
-plt.plot(test_graph_x, test_graph_y)
-plt.xlabel('iterations')
-plt.ylabel('average_score best')
-plt.show()
+#probleme d'evaluation
