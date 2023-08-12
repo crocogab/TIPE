@@ -1,13 +1,15 @@
 import random 
 import numpy as np
 import matplotlib.pyplot as plt
+from math import floor #partie entiere
+
 import sys
 
 
 sys.setrecursionlimit(100000) #pour éviter les erreurs de récursion
 
-PRECISION = 20
-NB_ITERATIONS=00
+PRECISION = 100
+NB_ITERATIONS=1000
 NB_INDIVIDUS=32 #multiple de 32
 CROUPIER_MAIN=2 #valeur de la main du croupier à observer
 
@@ -135,8 +137,6 @@ def mutation(i1: Individu):
     i1_p = i1
     i1_p.chromosomes[index1] = 1-i1.chromosomes[index1]
     i1_p.evaluate()
-    if i1_p.fitness<i1.fitness: #garde le meilleur
-        i1_p=i1
     return i1_p    
                                   
 
@@ -145,17 +145,17 @@ def croisement(i1: Individu, i2: Individu):
     i3 = Individu()
     i4=Individu()
     
-    index1 = random.randint(0, 188)
-    index2 = random.randint(0, 188)
+    index1 = random.randint(2, 188)
+    index2 = random.randint(2, 188)
     
-    i3.chromosomes = i1.chromosomes[:index1] + i2.chromosomes[index1:]
-    i4.chromosomes = i1.chromosomes[:index2] + i2.chromosomes[index2:]
+    index3 = random.randint(0, index1-1)
+    index4 = random.randint(0, index2-1)
+    
+    i3.chromosomes = i1.chromosomes[:index3] + i2.chromosomes[index3:index1] + i1.chromosomes[index1:]
+    i4.chromosomes = i1.chromosomes[:index4] + i2.chromosomes[index4:index2] + i1.chromosomes[index2:]
+
     i3.evaluate()
     i4.evaluate()
-    if i3.fitness<i1.fitness: #garde le meilleur
-        i3=i1
-    if i4.fitness<i2.fitness:
-        i4=i2
     return i3,i4
 
 def find(liste,val):
@@ -181,7 +181,7 @@ def generation(list_individus,gen_nb):
             """ moitié est conservée"""
             list_conserv.append(list_individus[0])
             list_individus.pop(0) 
-
+        
         for _ in range(NB_INDIVIDUS//4):
             """ un quart est muté"""
             list_conserv.append(mutation(list_individus[0]))
@@ -189,37 +189,48 @@ def generation(list_individus,gen_nb):
         
         for _ in range(NB_INDIVIDUS//8):
             """ un quart est croisé"""
-            i1,i2=croisement(list_individus[0],list_individus[NB_INDIVIDUS//8])
-            i1.evaluate()
-            i2.evaluate()
+            i1,i2=croisement(list_individus[0],list_individus[NB_INDIVIDUS-len(list_conserv)-1])
             list_conserv.append(i1)
             list_conserv.append(i2)
-            list_conserv.pop(0)
-            list_conserv.pop(NB_INDIVIDUS//8)
+            list_individus.pop(0)
+            list_individus.pop(NB_INDIVIDUS-len(list_conserv))
         
-        ### Roulette wheel selection
+        
+        ### Stochastic remainder without replacement selection
+        
+        liste_finale=[]
         score=0
-        association=[]
+        moy_fitness=sum([individu.fitness for individu in list_conserv])/NB_INDIVIDUS
 
         for id in list_conserv:
+            r_i=id.fitness/moy_fitness
+            a=floor(r_i)
+            for _ in range(a):  
+                liste_finale.append(id)
+            
+        
+        association=[]
+        for id in list_conserv:
             debut=score
-            score+=id.fitness
+            score+=(id.fitness/moy_fitness)-floor(id.fitness/moy_fitness)
             fin=score
             association.append((id,debut,fin))
         
-        liste_finale=[]
-
-        for _ in range(NB_INDIVIDUS):
+        for _ in range(NB_INDIVIDUS-len(liste_finale)):
             a=random.uniform(0,1)
             liste_finale.append(find(association,a*score))
-        ###
+
+    
+        #############
+        
+        
 
 
         if gen_nb%10==0:
             test_graph_x.append(gen_nb)
-            test_graph_y.append(score)
+            test_graph_y.append(moy_fitness)
         
-        print(f'Generation : {gen_nb} | score : {score}')
+        print(f'Generation : {gen_nb} | score : {moy_fitness}')
         generation(liste_finale,gen_nb+1)
 
 def generate():

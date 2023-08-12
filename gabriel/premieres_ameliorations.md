@@ -62,7 +62,7 @@ import sys
 sys.setrecursionlimit(100000) #pour éviter les erreurs de récursion
 
 PRECISION = 20
-NB_ITERATIONS=00
+NB_ITERATIONS=2000
 NB_INDIVIDUS=32 #multiple de 32
 CROUPIER_MAIN=2 #valeur de la main du croupier à observer
 
@@ -295,3 +295,33 @@ plt.show()
 
 
 ```
+
+Stochastic remainder without replacement selection:
+```python
+
+liste_finale=[]
+score=0
+moy_fitness=sum([individu.fitness for individu in list_conserv])/NB_INDIVIDUS
+
+for id in list_conserv:
+    r_i=id.fitness/moy_fitness
+    a=floor(r_i)
+    for _ in range(a):  
+        liste_finale.append(id)
+            
+        
+association=[]
+for id in list_conserv:
+    debut=score
+    score+=(id.fitness/moy_fitness)-floor(id.fitness/moy_fitness)
+    fin=score
+    association.append((id,debut,fin))
+        
+for _ in range(NB_INDIVIDUS-len(liste_finale)):
+    a=random.uniform(0,1)
+    liste_finale.append(find(association,a*score))
+
+
+```
+
+![fitness_score](fitness_evolution.png) 
