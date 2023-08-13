@@ -1,20 +1,25 @@
 import random 
 import numpy as np
 import matplotlib.pyplot as plt
-from math import floor #partie entiere
-
+from math import * #partie entiere + pi + tangente
+import json
 import sys
 
+with open('C:/Users/croco/Documents/GitHub/TIPE/gabriel/config.json') as config_file:
+    data = json.load(config_file)
 
-sys.setrecursionlimit(100000) #pour éviter les erreurs de récursion
+sys.setrecursionlimit(1000000) #pour éviter les erreurs de récursion
 
-PRECISION = 100
-NB_ITERATIONS=1000
-NB_INDIVIDUS=32 #multiple de 32
-CROUPIER_MAIN=2 #valeur de la main du croupier à observer
+PRECISION = data['precision']
+NB_ITERATIONS=data['nb_iterations']
+NB_INDIVIDUS=data['nb_individus'] #
+CROUPIER_MAIN=data['main_a_regarder'] #valeur de la main du croupier à observer
+P=data['p_scaling']  #valeur pour le scaling
+PROBA_ARRAY=[1,2,3,4,5,6,7,8,9,10,10,10,10]
 
-test_graph_x=[]
-test_graph_y=[]
+
+# test_graph_x=[]
+# test_graph_y=[]
 
 class Individu():
     def __init__(self) -> None:
@@ -84,10 +89,8 @@ class Individu():
         p_in_game=True
         c_in_game=True
         winner=False
-        player_list=[np.random.choice(np.arange(1, 11), p=( #renvoie une valeur de 1/10 pondérée
-                    [1/13 for _ in range(9)]+[4/13]))]
-        croupier_list=[np.random.choice(np.arange(1, 11), p=(
-                    [1/13 for _ in range(9)]+[4/13]))]
+        player_list=[random.choice(PROBA_ARRAY)]
+        croupier_list=[random.choice(PROBA_ARRAY)]
         while in_game:
             
 
@@ -95,14 +98,12 @@ class Individu():
            
             
             if self.chromosomes[choice]==1 and p_in_game:
-                   player_list.append(np.random.choice(np.arange(1, 11), p=(
-                    [1/13 for _ in range(9)]+[4/13])))
+                   player_list.append(random.choice(PROBA_ARRAY))
             else:
                 p_in_game=False
             
             if self.calculate_val(croupier_list)<17 and c_in_game:
-                croupier_list.append(np.random.choice(np.arange(1, 11), p=(
-                    [1/13 for _ in range(9)]+[4/13])))
+                croupier_list.append(random.choice(PROBA_ARRAY))
             else:
                 c_in_game=False
             
@@ -200,10 +201,11 @@ def generation(list_individus,gen_nb):
         
         liste_finale=[]
         score=0
-        moy_fitness=sum([individu.fitness for individu in list_conserv])/NB_INDIVIDUS
+        k_exp=exp_scaling(gen_nb)
+        moy_fitness=sum([(individu.fitness)**k_exp for individu in list_conserv])/NB_INDIVIDUS
 
         for id in list_conserv:
-            r_i=id.fitness/moy_fitness
+            r_i=((id.fitness)**k_exp)/moy_fitness
             a=floor(r_i)
             for _ in range(a):  
                 liste_finale.append(id)
@@ -212,7 +214,7 @@ def generation(list_individus,gen_nb):
         association=[]
         for id in list_conserv:
             debut=score
-            score+=(id.fitness/moy_fitness)-floor(id.fitness/moy_fitness)
+            score+=((id.fitness)**k_exp)/moy_fitness-floor(((id.fitness)**k_exp)/moy_fitness)
             fin=score
             association.append((id,debut,fin))
         
@@ -223,15 +225,30 @@ def generation(list_individus,gen_nb):
     
         #############
         
-        
+        if gen_nb%1000==0:
+            """On enregistre sur fichier json pour save le training"""
+            individu_json={
+                'nb_generation':gen_nb,
+                'fitness_moyenne':moy_fitness,
+                'chromosomes':[''.join(map(str,individu.chromosomes)) for individu in liste_finale]
+            }
+            with open(r"C:\Users\croco\Documents\GitHub\TIPE\gabriel\training.json", "w") as f:
+                f.write(json.dumps(individu_json, indent=4))
 
 
-        if gen_nb%10==0:
-            test_graph_x.append(gen_nb)
-            test_graph_y.append(moy_fitness)
-        
-        print(f'Generation : {gen_nb} | score : {moy_fitness}')
+
+        if gen_nb%1000==0:
+           
+            print(f'Generation : {gen_nb} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
         generation(liste_finale,gen_nb+1)
+
+        
+
+def  exp_scaling(iterations_actuelle:int):
+    """ permet un scaling exponentiel"""
+    return 1/((tan((iterations_actuelle/NB_ITERATIONS)*(pi/2)))**P)
+
+
 
 def generate():
     list_individus=[]
@@ -242,12 +259,12 @@ def generate():
         list_individus.append(i1)
     generation(list_individus,1)
 
-generate()
+#generate()
 
-plt.plot(test_graph_x, test_graph_y)
-plt.xlabel('iterations')
-plt.ylabel('average_score best')
-plt.show()
+# plt.plot(test_graph_x, test_graph_y)
+# plt.xlabel('iterations')
+# plt.ylabel('average_score best')
+# plt.show()
 
 # i1=Individu()
 # print(i1.convert(12,True,2))

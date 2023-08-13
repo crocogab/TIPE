@@ -325,3 +325,50 @@ for _ in range(NB_INDIVIDUS-len(liste_finale)):
 ```
 
 ![fitness_score](fitness_evolution.png) 
+
+-> probleme : on stagne à 0.2 à 1500 iterations environs -> puis suraprentissage
+pour eviter ca jvais faire un scaling exponentiel -> avoir une population moins homogene
+
+Image de la fonction de scaling en fonction du nb d'iteration 
+![scaling_exponentiel](scaling.png)
+
+Apres le scaling :
+
+![fitness_score2](fitness_evolution2.png) 
+Resultats sans scaling à environ 0.22 de score ( 5000 iterations - 16 individus - P=0.1)
+Soit une partie gagnée sur 5 -> encore du progres à faire
+-> jvais modifier p pour voir les changements + nb iterations 
+
+Valeurs à test : p=0.2 et 3000 iterations
+p=0.05 et 5000 iterations
+
+CHANGEMENT optimisation -> nouvelle fonction random 
+ fini numpy
+
+ ```python	
+ PROBA_ARRAY=[1,2,3,4,5,6,7,8,9,10,10,10,10]
+ random.choice(PROBA_ARRAY)
+ ```
+
+
+ meilleur resultats avec un score de 0.23 avec ces parametres :
+
+
+ ```python
+PRECISION = 30
+NB_ITERATIONS=20000
+NB_INDIVIDUS=32 #multiple de 32
+CROUPIER_MAIN=2
+P=0.08
+ 
+ ```	
+
+ -> g obtenu un 0.43 avec ces parametres
+
+  ```python
+ PRECISION = 30
+NB_ITERATIONS=50000
+NB_INDIVIDUS=64 #multiple de 32
+CROUPIER_MAIN=2 #valeur de la main du croupier à observer
+P=0.08 #valeur pour le scaling
+```

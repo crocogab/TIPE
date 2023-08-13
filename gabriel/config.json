@@ -1,0 +1,7 @@
+{
+    "precision" : 30,
+    "nb_iterations" : 60000,
+    "nb_individus": 64, 
+    "main_a_regarder":2, 
+    "p_scaling" :0.08
+}
