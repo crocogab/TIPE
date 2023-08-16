@@ -1,6 +1,4 @@
 import random 
-import numpy as np
-import matplotlib.pyplot as plt
 from math import * #partie entiere + pi + tangente
 import json
 import sys
@@ -134,7 +132,7 @@ class Individu():
 
 def mutation(i1: Individu):
     """Mutation d'un individu -> 1 bit aléatoire"""
-    index1 = random.randint(0, 188)
+    index1 = random.randint(0, 189)
     i1_p = i1
     i1_p.chromosomes[index1] = 1-i1.chromosomes[index1]
     i1_p.evaluate()
@@ -227,6 +225,7 @@ def generation(list_individus,gen_nb):
         
         if gen_nb%1000==0:
             """On enregistre sur fichier json pour save le training"""
+            
             individu_json={
                 'nb_generation':gen_nb,
                 'fitness_moyenne':moy_fitness,
