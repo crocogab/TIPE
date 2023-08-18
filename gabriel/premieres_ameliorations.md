@@ -372,3 +372,82 @@ NB_INDIVIDUS=64 #multiple de 32
 CROUPIER_MAIN=2 #valeur de la main du croupier à observer
 P=0.08 #valeur pour le scaling
 ```
+
+On va implementer du sharing de base-> permettre de repartir mieux les individus
+On va d'abord définir une distance 
+
+distance classique : 
+
+$$\sqrt{\sum_{k=1}^{N}(t_{1,k}-t_{2,k})²}$$
+
+Le sharing classique n'est pas vivable -> rajoue (N^2) calculs à chaque generation 
+-> on va faire du sharing clusterise
+
+le code :
+
+```python
+
+def distance(i1: Individu, i2: Individu):
+    """Distance entre deux individus"""
+    return sqrt(sum([(i1.chromosomes[i] - i2.chromosomes[i])**2 for i in range(190)]))
+
+def sharing_s(i1: Individu, i2: Individu):
+    """Fonction somme du sharing """
+    d = distance(i1, i2)
+    if d < sigma_sharing:
+        return 1 - (d/sigma_sharing)**alpha_sharing
+    else:
+        return 0
+
+
+def sharing(i1:Individu, list_individus:list):
+    """Fonction de Sharing"""
+    return sum([sharing_s(i1, i2) for i2 in list_individus])
+
+##########################
+#PASS
+##########################
+
+liste_finale=[]
+        score=0
+        k_exp=exp_scaling(gen_nb)
+        total=0
+        for individus in list_conserv:
+            liste_conserv_without_elem=[elem for elem in list_conserv if elem!=individus]
+            s=sharing(individus,liste_conserv_without_elem)
+            if s!=0:
+                total+=((individus.fitness)**k_exp)/sharing(individus,liste_conserv_without_elem)
+            else:
+                total+=((individus.fitness)**k_exp)
+
+
+        moy_fitness=total/NB_INDIVIDUS
+
+        for id in list_conserv:
+            s=sharing(individus,liste_conserv_without_elem)
+            if s!=0:
+                r_i=(((id.fitness)**k_exp)/s)/moy_fitness
+            else:
+                r_i=(((id.fitness)**k_exp))/moy_fitness
+            a=floor(r_i)
+            for _ in range(a):  
+                liste_finale.append(id)
+            
+        
+        association=[]
+        for id in list_conserv:
+            debut=score
+            s=sharing(individus,liste_conserv_without_elem)
+            if s!=0:
+                score+=(((id.fitness)**k_exp)/s)/moy_fitness-floor((((id.fitness)**k_exp)/s)/moy_fitness)
+            else:
+                score+=(((id.fitness)**k_exp))/moy_fitness-floor((((id.fitness)**k_exp))/moy_fitness)
+            fin=score
+            association.append((id,debut,fin))
+        
+        for _ in range(NB_INDIVIDUS-len(liste_finale)):
+            a=random.uniform(0,1)
+            liste_finale.append(find(association,a*score))
+
+
+```

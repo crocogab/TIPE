@@ -200,10 +200,18 @@ def generation(list_individus,gen_nb):
         liste_finale=[]
         score=0
         k_exp=exp_scaling(gen_nb)
-        moy_fitness=sum([(individu.fitness)**k_exp for individu in list_conserv])/NB_INDIVIDUS
+        total=0
+        for individus in list_conserv:
+            liste_conserv_without_elem=[elem for elem in list_conserv if elem!=individus]
+            
+            total+=((individus.fitness)**k_exp)
+
+
+        moy_fitness=total/NB_INDIVIDUS
 
         for id in list_conserv:
-            r_i=((id.fitness)**k_exp)/moy_fitness
+            
+            r_i=(((id.fitness)**k_exp))/moy_fitness
             a=floor(r_i)
             for _ in range(a):  
                 liste_finale.append(id)
@@ -212,7 +220,8 @@ def generation(list_individus,gen_nb):
         association=[]
         for id in list_conserv:
             debut=score
-            score+=((id.fitness)**k_exp)/moy_fitness-floor(((id.fitness)**k_exp)/moy_fitness)
+            
+            score+=(((id.fitness)**k_exp))/moy_fitness-floor((((id.fitness)**k_exp))/moy_fitness)
             fin=score
             association.append((id,debut,fin))
         
@@ -236,7 +245,7 @@ def generation(list_individus,gen_nb):
 
 
 
-        if gen_nb%1000==0:
+        if gen_nb%100==0:
            
             print(f'Generation : {gen_nb} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
         generation(liste_finale,gen_nb+1)
@@ -266,6 +275,10 @@ def generate():
 # plt.show()
 
 # i1=Individu()
+# i2=Individu()
+# i1.random_init()
+# i2.random_init()
+# print(distance(i1,i2))
 # print(i1.convert(12,True,2))
 # print(i1.convert(13,False,3))
 # print(i1.convert(17,False,5))

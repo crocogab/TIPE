@@ -1,4 +1,5 @@
-from individu5 import *
+from clean_genetic_algorithm import generation
+from individu import Individu
 import json
 
 with open(r'C:\Users\croco\Documents\GitHub\TIPE\gabriel\training.json') as training_file:
