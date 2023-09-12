@@ -1,13 +1,15 @@
 import time
 import sys
 import logging
+
 # TODO: Only generate the tree after the first two cards are drawn
 # TODO: check if lost before navigating
 
-#SAFENESS = 0.5
+# SAFENESS = 0.5
 # SAFENESS represents the minimum survival rate of a node's children to be considered a good node
 # the rate is calculated by dividing the number of children
 #  with a value < 21 by the total number of children
+
 
 class Tree:
     """
@@ -42,12 +44,14 @@ class Tree:
         """returns the child with the value next if it exists, else returns an empty tree"""
         try:
             return [child for child in self.children if child.val == int(next_node)][0]
-        except (IndexError,ValueError):
-            logging.warning(f"Invalid child value {next_node}, childs are %s", \
-                            [child.val for child in self.children])
+        except (IndexError, ValueError):
+            logging.warning(
+                f"Invalid child value {next_node}, childs are %s",
+                [child.val for child in self.children],
+            )
             return Tree(-1, -1)
 
-    def shouldtake(self,safeness:float):
+    def shouldtake(self, safeness: float):
         """returns True if the node is safe enough to be considered a good node"""
         if self.children == []:
             return False
@@ -74,20 +78,20 @@ def create_game_tree(current: Tree, depth: int):
 def main():
     """main function"""
     timestamp = time.time()
-    mytree = create_game_tree(Tree(0,0), 0)
+    mytree = create_game_tree(Tree(0, 0), 0)
     mytree.survival_meth()
     print(time.time() - timestamp)
     while True:
         next_card = input("Entrer la carte recue : ")
         while not next_card.isdigit() or int(next_card) not in range(1, 11):
             next_card = input("Entrée incorrecte : ")
-        mytree = mytree.navigate(int(next_card)) # not sure how it worked before
+        mytree = mytree.navigate(int(next_card))  # not sure how it worked before
         print(
             [child.val for child in mytree.children],
             mytree.virtualchildrenscount,
             " virtual childs",
         )
-        if mytree.shouldtake():
+        if mytree.shouldtake(0.5):
             print(mytree.total)
             print("Je prends")
             print(mytree.survival)
@@ -96,25 +100,25 @@ def main():
             print("Je ne prends pas")
             print(mytree.survival)
 
-def automate(card_string:str,safeness:float) -> tuple:
+
+def automate(card_string: str, safeness: float) -> tuple:
     """
     take a list of cards as argument and return true if the player should take a card
     """
     card_string = card_string.split(",")
-    logging.debug("card_tab: %s",card_string)
-    mytree = create_game_tree(Tree(0,0), 0)
+    logging.debug("card_tab: %s", card_string)
+    mytree = create_game_tree(Tree(0, 0), 0)
     mytree.survival_meth()
     for card in card_string:
         mytree = mytree.navigate(card)
-    return mytree.shouldtake(safeness),mytree.survival
-
+    return mytree.shouldtake(safeness), mytree.survival
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "game":
         main()
     elif len(sys.argv) > 1:
-        automate(sys.argv[1].split(","),float(sys.argv[2]))
-        logging.debug("sys.argv[1]: %s",sys.argv[1])
+        automate(sys.argv[1].split(","), float(sys.argv[2]))
+        logging.debug("sys.argv[1]: %s", sys.argv[1])
     else:
-        automate([10],0.5)
+        automate([10], 0.5)
