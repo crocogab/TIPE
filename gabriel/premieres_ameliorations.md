@@ -451,3 +451,17 @@ liste_finale=[]
 
 
 ```
+
+
+debug + patch de la fonction play -> bons resultats 
+
+```python	
+print(f"[debug] : player_list : %s" % player_list)
+print(f"[debug] : player_score : %s" % self.calculate_val(player_list))
+
+print(f"[debug] : croupier_list : %s" % croupier_list)
+print(f"[debug] : croupier_score : %s" % self.calculate_val(croupier_list))
+
+print(f"[WINNER] %s" % winner)
+
+```

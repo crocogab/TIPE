@@ -33,7 +33,7 @@ for elem in list_chromosomes:
 
 
 
-
+print('[DEBUG]: fitness_max = ', max)
 
 fenetre = Tk()
 

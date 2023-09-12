@@ -1,8 +1,8 @@
 {
-    "precision" : 30,
-    "nb_iterations" : 10000,
-    "nb_individus": 16384, 
+    "precision" : 350,
+    "nb_iterations" : 1000,
+    "nb_individus": 8192, 
     "main_a_regarder":2, 
-    "p_scaling" :0.1
+    "p_scaling" :0.08
     
 }

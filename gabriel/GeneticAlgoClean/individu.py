@@ -74,6 +74,7 @@ class Individu():
     
     def play(self):
         """Joue un 1v1 contre le croupier en fonction de ses chromosomes et voit si il gagne"""
+        
         in_game=True
         p_in_game=True
         c_in_game=True
@@ -82,6 +83,7 @@ class Individu():
         croupier_list=[random.choice(PROBA_ARRAY)]
         while in_game:
             
+    
 
             choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
            
@@ -93,6 +95,7 @@ class Individu():
             
             if self.calculate_val(croupier_list)<17 and c_in_game:
                 croupier_list.append(random.choice(PROBA_ARRAY))
+                
             else:
                 c_in_game=False
             
@@ -100,6 +103,9 @@ class Individu():
                 in_game=False
                 if self.calculate_val(player_list)<21 and self.calculate_val(player_list)>self.calculate_val(croupier_list):
                     winner=True
+            elif self.calculate_val(croupier_list)>21:
+                winner=True
+                in_game=False
             elif self.calculate_val(player_list)>21:
                 winner=False
                 in_game=False
@@ -107,7 +113,7 @@ class Individu():
                 winner=True
                 in_game=False
         
-    
+        
         return winner
     
 

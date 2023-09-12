@@ -108,7 +108,7 @@ def generation(list_individus,gen_nb):
 
 
 
-        if gen_nb%100==0:
+        if gen_nb%10==0:
            
             print(f'Generation : {gen_nb} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
         generation(liste_finale,gen_nb+1)
