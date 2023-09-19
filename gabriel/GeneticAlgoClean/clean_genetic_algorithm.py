@@ -10,7 +10,7 @@ from math import floor
 
 sys.setrecursionlimit(1000000)
 
-with open('C:/Users/croco/Documents/GitHub/TIPE/gabriel/config.json') as config_file:
+with open(r'config.json') as config_file:
     data = json.load(config_file)
 
 NB_ITERATIONS=data['nb_iterations']
@@ -103,7 +103,7 @@ def generation(list_individus,gen_nb):
                 'fitness_moyenne':moy_fitness,
                 'chromosomes':[''.join(map(str,individu.chromosomes)) for individu in liste_finale]
             }
-            with open(r"C:\Users\croco\Documents\GitHub\TIPE\gabriel\training.json", "w") as f:
+            with open(r"training.json", "w") as f:
                 f.write(json.dumps(individu_json, indent=4))
 
 

@@ -1,7 +1,7 @@
 import random 
 import json
 
-with open('C:/Users/croco/Documents/GitHub/TIPE/gabriel/config.json') as config_file:
+with open(r'config.json') as config_file:
     data = json.load(config_file)
 
 ############ Paramètres ############
