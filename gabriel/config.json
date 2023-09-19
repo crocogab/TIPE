@@ -1,5 +1,5 @@
 {
-    "precision" : 350,
+    "precision" : 1500,
     "nb_iterations" : 1000,
     "nb_individus": 8192, 
     "main_a_regarder":2, 
