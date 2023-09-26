@@ -1,5 +1,7 @@
 import random 
 import json
+import fastrand
+
 
 with open(r'config.json') as config_file:
     data = json.load(config_file)
@@ -79,8 +81,8 @@ class Individu():
         p_in_game=True
         c_in_game=True
         winner=False
-        player_list=[random.choice(PROBA_ARRAY)]
-        croupier_list=[random.choice(PROBA_ARRAY)]
+        player_list=[PROBA_ARRAY[fastrand.pcg32bounded(13)]]
+        croupier_list=[PROBA_ARRAY[fastrand.pcg32bounded(13)]]
         while in_game:
             
     
@@ -89,12 +91,12 @@ class Individu():
            
             
             if self.chromosomes[choice]==1 and p_in_game:
-                   player_list.append(random.choice(PROBA_ARRAY))
+                   player_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
             else:
                 p_in_game=False
             
             if self.calculate_val(croupier_list)<17 and c_in_game:
-                croupier_list.append(random.choice(PROBA_ARRAY))
+                croupier_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
                 
             else:
                 c_in_game=False
