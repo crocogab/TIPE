@@ -36,19 +36,15 @@ def fusion_clusters(clusters: list):
   """Met à jour les centres des clusters 
   ATTENTION -> ne conserve pas forcement la taille de la liste clusters
   """
-  liste_a_del=[]
-  for i in range(len(clusters)):
-    for j in range(len(clusters)):
-      if i!=j:
-        if distance_liste(clusters[i].centre,clusters[j].centre)<d_min:
-          print(f"[DEBUG] fusion entre {i} {j}")
-          clusters[i].centre=[(clusters[i].centre[l]+clusters[j].centre[l])/2 for l in range(190)]
-          clusters[i].individus.extend(clusters[j].individus)
-          liste_a_del.append(j)
-  a=0
-  for j in liste_a_del:
-    del clusters[j-a]
-    a+=1 
+
+  for c1 in clusters:
+    for c2 in clusters:
+      if c1!=c2:
+        if distance_liste(c1.centre,c2.centre)<d_min:
+          #print(f"[DEBUG] fusion entre {c1} {c2}")
+          c1.centre=[(c1.centre[l]+c2.centre[l])/2 for l in range(190)]
+          c1.individus.extend(c2.individus)
+
  
   
 
@@ -88,14 +84,3 @@ def sharing(i1:Individu,clusters:list):
   
   nc,c=individu_clusters(i1,clusters)
   return nc*(1-((distance_liste(i1.chromosomes,c.centre))/(2*d_max))**alpha)
-
-    
-
-                
-                
-
-    
-                
-
-        
-
