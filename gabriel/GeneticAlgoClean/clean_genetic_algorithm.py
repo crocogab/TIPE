@@ -3,6 +3,7 @@ import json
 import sys
 from mutation import *
 from scaling import *
+from sharing import *
 from math import floor
 
 
@@ -62,31 +63,39 @@ def generation(list_individus,gen_nb):
         score=0
         k_exp=exp_scaling(gen_nb)
         total=0
+        clusters=init_clusters(list_conserv)
+        fusion_clusters(clusters)
+
+        mi_value=[sharing(i1,clusters) for i1 in list_conserv]
+
+        print(f"[DEBUG]: tableau cree : \n{mi_value}")
+
+
 
         
 
-        for individus in list_conserv:
-            total+=((individus.fitness)**k_exp)
+        for i in range(len(list_conserv)):
+            total+=(((list_conserv[i].fitness)**k_exp)/mi_value[i])
 
 
         moy_fitness=total/NB_INDIVIDUS
 
-        for id in list_conserv:
+        for i in range(len(list_conserv)):
             
-            r_i=(((id.fitness)**k_exp))/moy_fitness
+            r_i=((((list_conserv[i].fitness)**k_exp))/mi_value[i])/moy_fitness
             a=floor(r_i)
             for _ in range(a):  
-                liste_finale.append(id)
+                liste_finale.append(list_conserv[i])
             
         
         association=[]
-        for id in list_conserv:
+        for i in range(len(list_conserv)):
             debut=score
             
             
-            score+=(((id.fitness)**k_exp))/moy_fitness-floor((((id.fitness)**k_exp))/moy_fitness)
+            score+=((((list_conserv[i].fitness)**k_exp))/mi_value[i])/moy_fitness-floor(((((list_conserv[i].fitness)**k_exp))/mi_value[i])/moy_fitness)
             fin=score
-            association.append((id,debut,fin))
+            association.append((list_conserv[i],debut,fin))
         
         for _ in range(NB_INDIVIDUS-len(liste_finale)):
             a=random.uniform(0,1)
@@ -95,7 +104,7 @@ def generation(list_individus,gen_nb):
     
         #############
     
-        if gen_nb%100==0:
+        if gen_nb%10==0:
             """On enregistre sur fichier json pour save le training"""
             
             individu_json={
@@ -108,9 +117,9 @@ def generation(list_individus,gen_nb):
 
 
 
-        if gen_nb%10==0:
+    
            
-            print(f'Generation : {gen_nb} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
+        print(f'Generation : {gen_nb} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
         generation(liste_finale,gen_nb+1)
 
 def generate():
