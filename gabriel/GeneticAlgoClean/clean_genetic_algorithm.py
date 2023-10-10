@@ -26,7 +26,8 @@ def find(liste,val):
 
 #####################################
 
-def generation(list_individus,gen_nb):
+def generation(list_individus,gen_nb,cluster_list):
+
     
     if gen_nb==NB_ITERATIONS:
         
@@ -38,37 +39,57 @@ def generation(list_individus,gen_nb):
             print(f'evaluate : {individu.fitness}\n{individu}\n') #plus forcement le meme evaluate qu'avant (random) donc le meme sens
     else:
         list_conserv=[]
+        clusters=cluster_list
+
+
         for _ in range(NB_INDIVIDUS//2):
             """ moitié est conservée"""
             list_conserv.append(list_individus[0])
             list_individus.pop(0) 
         
-        for _ in range(NB_INDIVIDUS//4):
+        for i in range(NB_INDIVIDUS//4):
             """ un quart est muté"""
-            list_conserv.append(mutation(list_individus[0]))
+            i1=mutation(list_individus[0])
+
+            remove_individu(list_individus[0],clusters)
+            add_individu(i1,clusters)
+
+            list_conserv.append(i1)
             list_individus.pop(0)
-        
-        for _ in range(NB_INDIVIDUS//8):
+    
+        for i in range(NB_INDIVIDUS//8):
             """ un quart est croisé"""
             i1,i2=croisement(list_individus[0],list_individus[NB_INDIVIDUS-len(list_conserv)-1])
+
+            remove_individu(list_individus[0],clusters)
+            add_individu(i1,clusters)
+
+            
+            remove_individu((list_individus[NB_INDIVIDUS-len(list_conserv)-1]),clusters)
+            add_individu(i2,clusters)
+
             list_conserv.append(i1)
             list_conserv.append(i2)
             list_individus.pop(0)
             list_individus.pop(NB_INDIVIDUS-len(list_conserv))
         
-        
+  
         ### Stochastic remainder without replacement selection + sharing
-        
+        if gen_nb>1:
+          for i in range(len(list_conserv)):
+            print(i)
+            print(individu_clusters(list_conserv[i],clusters)[0])
+
+
         liste_finale=[]
         score=0
         k_exp=exp_scaling(gen_nb)
         total=0
-        clusters=init_clusters(list_conserv)
-        fusion_clusters(clusters)
+        
 
         mi_value=[sharing(i1,clusters) for i1 in list_conserv]
 
-        print(f"[DEBUG]: tableau cree : \n{mi_value}")
+        print(f"[DEBUG]: tableau cree -> val max = {max(mi_value)}")
 
 
 
@@ -120,7 +141,8 @@ def generation(list_individus,gen_nb):
     
            
         print(f'Generation : {gen_nb} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
-        generation(liste_finale,gen_nb+1)
+        
+        generation(liste_finale,gen_nb+1,clusters)
 
 def generate():
     list_individus=[]
@@ -129,7 +151,10 @@ def generate():
         i1.random_init()
         i1.evaluate()
         list_individus.append(i1)
-    generation(list_individus,1)
+    clusters=init_clusters(list_individus)
+    fusion_clusters(clusters)
+    print("[DEBUG] Clusters ont ete init")
+    generation(list_individus,1,clusters)
         
 if __name__=='__main__':
     generate()
