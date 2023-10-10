@@ -1,3 +1,4 @@
+from re import I
 from individu import Individu
 from math import sqrt
 
@@ -52,6 +53,7 @@ def add_individu(i1:Individu,clusters:list):
   """Ajoute l'individu à la liste des clusters -> crée les nouveaux clusters
   Ou modifie barycentre
   """
+  
   etat=0
   indice=-1
   for indice_c in range(len(clusters)):
@@ -59,12 +61,24 @@ def add_individu(i1:Individu,clusters:list):
       etat=1
       indice=indice_c
   if etat==1:
-    clusters[indice].centre=[(clusters[indice].centre[l]+i1.chromosomes[l])/2 for l in range(190)]
+    
+    a=len(clusters[indice].individus)+1
+    clusters[indice].centre=[(clusters[indice].centre[l]+i1.chromosomes[l])/a for l in range(190)]
+    clusters[indice].individus.append(i1)
   else:
-    clusters.append(cluster(individus=i1,centre=i1.chromosomes))
+    c=cluster()
+    c.individus=[i1]
+    c.centre=i1.chromosomes
+    clusters.append(c)
 
 
 
+def remove_individu(i1:Individu,clusters:list):
+  for c in clusters:
+
+    if i1 in c.individus:
+        return c.individus.pop(c.individus.index(i1))
+          
 
 
 
@@ -72,7 +86,9 @@ def add_individu(i1:Individu,clusters:list):
 def individu_clusters(i1: Individu, clusters: list):
     """Nombre d'individus dans le cluster de i1"""
     for c in clusters:
+        
         if i1 in c.individus:
+
             return (len(c.individus),c)
   
     print( f"Error individu not found {type(c)} {i1}") # cochon -> debug
@@ -84,3 +100,14 @@ def sharing(i1:Individu,clusters:list):
   
   nc,c=individu_clusters(i1,clusters)
   return nc*(1-((distance_liste(i1.chromosomes,c.centre))/(2*d_max))**alpha)
+
+    
+
+                
+                
+
+    
+                
+
+        
+
