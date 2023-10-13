@@ -1,8 +1,12 @@
 import random as rd
 import sys
 import colorama as col
+
 suits = ["club", "diamond", "heart", "spade"]
-color_list = [col.Fore.RED, col.Fore.BLUE, ]
+color_list = [
+    col.Fore.RED,
+    col.Fore.BLUE,
+]
 INFO = col.Fore.CYAN
 col.init()
 HEADLESS = True
@@ -46,7 +50,9 @@ class Hand:
 
     def __str__(self):
         # l'ancienne version ne marchait pas (cards.l_cards) ça affichait l'adresse mémoire
-        string = f"Nombre de cartes : {self.nb_cards} ,total = {self.get_value()} ,cartes = "
+        string = (
+            f"Nombre de cartes : {self.nb_cards} ,total = {self.get_value()} ,cartes = "
+        )
         if self.nb_cards == 0:
             return string + "None"
         for card in self.l_cards:
@@ -100,7 +106,7 @@ class Deck:
         """
         Mélange un deck shuffles fois
         """
-        lcard=[]
+        lcard = []
         for _ in range(shuffles):
             for _ in range(self.nb_cards):
                 lcard.append(self.l_cards.pop(rd.randint(0, self.nb_cards - 1)))
@@ -158,8 +164,11 @@ class Croupier:
                     print(INFO, "Croupier pioche.", col.Style.RESET_ALL)
                 current_game.give_card(self)
                 if self.hand.l_cards != [] and len(sys.argv) != 0 and not HEADLESS:
-                    print(INFO, f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}",\
-                          col.Style.RESET_ALL)
+                    print(
+                        INFO,
+                        f"La premiere carte du jeu du croupier est {self.hand.l_cards[0]}",
+                        col.Style.RESET_ALL,
+                    )
             elif not HEADLESS:
                 print("Le croupier s'arrete")
             self.stopped = True
@@ -182,7 +191,9 @@ class Player:
         self.is_out = False
         self.stopped = False
         self.is_croupier = False
-        self.color = color_list[rd.randint(0, len(color_list)-1)] if not HEADLESS else ""
+        self.color = (
+            color_list[rd.randint(0, len(color_list) - 1)] if not HEADLESS else ""
+        )
         if color_list.__contains__(self.color):
             color_list.remove(self.color)
 
@@ -193,7 +204,7 @@ class Player:
         """
         if self.hand.get_value() > 21:
             if not HEADLESS:
-                print(self.color+f"{self.hand}\n")
+                print(self.color + f"{self.hand}\n")
                 print(f"Joueur {self.id} est out")
             self.is_out = True
         elif self.hand.get_value() == 21:
@@ -206,8 +217,12 @@ class Player:
         Fonction qui permet au joueur de jouer
         """
         if not self.is_out and not self.stopped:
-            print(self.color, "Voulez vous prendre une carte (o/n)",
-                  col.Style.RESET_ALL, end="")
+            print(
+                self.color,
+                "Voulez vous prendre une carte (o/n)",
+                col.Style.RESET_ALL,
+                end="",
+            )
             choice = input()
             if choice in ["o", "O"]:
                 current_game.give_card(self)
@@ -271,7 +286,7 @@ def make_deck(deck_nbr: int) -> Deck:
     """
     returns a deck of deck_nbr*52 cards
     """
-    deck = Deck(deck_nbr*52, [])
+    deck = Deck(deck_nbr * 52, [])
     for i in range(deck_nbr):
         for i in range(4):
             for j in range(1, 14):
@@ -286,18 +301,35 @@ def game(players: list):
     deck = make_deck(1)
     deck.shuffle(100)
     my_game = Game(players, deck)
-    while len([player for player in players if (not player.stopped and not player.is_out)]) >= 1:
+    while (
+        len(
+            [player for player in players if (not player.stopped and not player.is_out)]
+        )
+        >= 1
+    ):
         for player in players:
             if not player.stopped and not player.is_out and not player.is_croupier:
                 print(
-                    player.color, f"Joueur {player.id} : {player.hand}", col.Style.RESET_ALL)
+                    player.color,
+                    f"Joueur {player.id} : {player.hand}",
+                    col.Style.RESET_ALL,
+                )
                 player.play(my_game)
                 player.check()
             else:
                 player.play(my_game)
                 player.check(my_game)
     print("Fin de la partie, Résultats :")
-    if len([player for player in players if (not player.is_out and not player.is_croupier)]) == 0:
+    if (
+        len(
+            [
+                player
+                for player in players
+                if (not player.is_out and not player.is_croupier)
+            ]
+        )
+        == 0
+    ):
         print("Tous les joueurs sont out, la banque gagne")
     else:
         my_croupier = [player for player in players if player.is_croupier][0]
@@ -308,21 +340,26 @@ def game(players: list):
                 if player.hand.get_value() > croupier_hand_value:
                     print(
                         f"Joueur {player.id} a gagné avec le jeu \
-                        {player.hand} total = {player.hand.get_value()}")
+                        {player.hand} total = {player.hand.get_value()}"
+                    )
                 elif player.hand.get_value() == croupier_hand_value:
                     print(
                         f"Joueur {player.id} a fait égalité avec le croupier avec le jeu\
-                             {player.hand} total = {player.hand.get_value()}")
-                elif not croupier.is_out:
+                             {player.hand} total = {player.hand.get_value()}"
+                    )
+                elif not my_croupier.is_out:
                     print(
                         f"Joueur {player.id} a perdu contre le croupier avec le jeu\
-                             {player.hand} total = {player.hand.get_value()}")
+                             {player.hand} total = {player.hand.get_value()}"
+                    )
             elif player.is_out:
                 print(
                     f"Joueur {player.id} a perdu (+21)\
-                        {player.hand} total = {player.hand.get_value()}")
+                        {player.hand} total = {player.hand.get_value()}"
+                )
         print(
-            f"Croupier avec le jeu : {croupier.hand} total = {croupier.hand.get_value()}")
+            f"Croupier avec le jeu : {my_croupier.hand} total = {my_croupier.hand.get_value()}"
+        )
 
 
 if __name__ == "__main__":
