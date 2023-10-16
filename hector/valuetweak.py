@@ -2,11 +2,9 @@
 # Théorie: Tirer une valeur de SAFENESS aléatoire entre 0 et 1, et
 # enregistrer sous le format suivant : victoire(0/1),SAFENESS\n
 import logging
-import sys
+import tqdm
 import tree
 from blackjack import Player, Croupier, Game, Hand, make_deck
-import timeit
-import tqdm
 
 logging.basicConfig(level=logging.INFO)
 
@@ -123,17 +121,17 @@ def wrapper():
         safeness += step
 
 
-def contest(n: int):
-    "plays n games and print the winrate (use a loading bar)"
+def contest(number: int):
+    "plays number games and print the winrate (use a loading bar)"
     mydeck = tree.make_my_deck()
     mytree = tree.create_game_tree(tree.Tree(0, 0), 0, mydeck)
     mytree.survival_meth()
     lost = 0
-    for _ in tqdm.tqdm(range(n)):
+    for _ in tqdm.tqdm(range(number)):
         if simple(0.45, mytree):
             lost += 1
     mytree = mytree.root
-    print(f"Winrate: {(1 - lost/n)*100}")
+    print(f"Winrate: {(1 - lost/number)*100}")
 
 
 if __name__ == "__main__":

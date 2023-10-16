@@ -2,11 +2,6 @@ import time
 import sys
 import logging
 
-
-# TODO: Only generate the tree after the first two cards are drawn
-# TODO: check if lost before navigating
-
-# SAFENESS = 0.5
 # SAFENESS = 0.5
 # SAFENESS represents the minimum survival rate of a node's children to be considered a good node
 # the rate is calculated by dividing the number of children
@@ -32,8 +27,10 @@ class Tree:
     def survival_meth(self):
         """calculates the survival rate of the tree"""
         try:
-            mysum = sum([child.weight for child in self.children if child.total <= 21])
-            self.survival = mysum / (mysum + self.virtualchildrenscount)
+            total_weight = sum(
+                child.weight for child in self.children if child.total <= 21
+            )
+            self.survival = total_weight / (total_weight + self.virtualchildrenscount)
         except ZeroDivisionError:
             self.survival = 0
         for child in self.children:
@@ -82,7 +79,7 @@ def create_game_tree(current: Tree, depth: int, deck: list):
             else:  # else, increment the weight of the existing child
                 current.navigate(card).weight += 1
         else:
-            # if the total + the card is more than 21 the game is lost so we don't bother creating a child we just count it
+            # if total + card > 21 the game is lost so we don't create a child we just count it
             current.virtualchildrenscount += 1
     for child in current.children:
         # for each child, remove the card from the deck and create the tree
@@ -98,9 +95,12 @@ def create_game_tree(current: Tree, depth: int, deck: list):
 
 
 def make_my_deck():
+    """
+    returns a list of cards
+    """
     cards = []
     for i in range(13):
-        for j in range(4):
+        for _ in range(4):
             if i >= 10:
                 cards.append(10)
             else:
