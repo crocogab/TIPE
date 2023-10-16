@@ -13,7 +13,6 @@ import logging
 #  with a value < 21 by the total number of children
 
 
-
 class Tree:
     """
     A tree is a node with a value and a list of children
@@ -58,7 +57,6 @@ class Tree:
             return Tree(-1, -1)
         return -1
 
-    def shouldtake(self, safeness: float):
     def shouldtake(self, safeness: float):
         """returns True if the node is safe enough to be considered a good node"""
         if self.children == []:
@@ -141,25 +139,25 @@ def main():
             print("Je ne prends pas")
             print(mytree.survival)
 
-def automate(card_string:str,safeness:float) -> tuple:
+
+def automate(card_string: str, safeness: float) -> tuple:
     """
     take a list of cards as argument and return true if the player should take a card
     """
     card_string = card_string.split(",")
-    logging.debug("card_tab: %s",card_string)
-    mytree = create_game_tree(Tree(0,0), 0)
+    logging.debug("card_tab: %s", card_string)
+    mytree = create_game_tree(Tree(0, 0), 0, make_my_deck())
     mytree.survival_meth()
     for card in card_string:
         mytree = mytree.navigate(card)
-    return mytree.shouldtake(safeness),mytree.survival
-
+    return mytree.shouldtake(safeness), mytree.survival
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "game":
         main()
     elif len(sys.argv) > 1:
-        automate(sys.argv[1].split(","),float(sys.argv[2]))
-        logging.debug("sys.argv[1]: %s",sys.argv[1])
+        automate(sys.argv[1].split(","), float(sys.argv[2]))
+        logging.debug("sys.argv[1]: %s", sys.argv[1])
     else:
-        automate([10],0.5)
+        automate([10], 0.5)

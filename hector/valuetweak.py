@@ -21,16 +21,10 @@ def simple(safeness: float, mytree: tree.Tree) -> bool:
     croup = Croupier(Hand(0, []), 1)
     my_game = Game([player, croup], deck)
     # Here, we take two cards for each player as it is the minimum to start the game
-    mytree = tree.create_game_tree(tree.Tree(0, 0), 0)
-    logging.info("\033[32m" + "--------------------" + "\033[0m")
     logging.debug("\033[33m" + "----------GAME START----------" + "\033[0m")
     for _ in range(2):
         my_game.give_card(player)
         my_game.give_card(croup)
-    logging.debug("player hand: %s", player.hand)
-    while (not player.is_out and not player.stopped) or (
-        not croup.is_out and not croup.stopped
-    ):
     logging.debug("player hand: %s", player.hand)
     while (not player.is_out and not player.stopped) or (
         not croup.is_out and not croup.stopped
@@ -43,27 +37,15 @@ def simple(safeness: float, mytree: tree.Tree) -> bool:
                 automate(cards_string, safeness, mytree)[0]
                 or player.hand.get_value() == 0
             ):
-                logging.info(
+                logging.debug(
                     "HIT! %s cards with a value of %s",
                     len(player.hand.l_cards),
                     player.hand.get_value(),
                 )
-            if (
-                automate(cards_string, safeness, mytree)[0]
-                or player.hand.get_value() == 0
-            ):
-                # logging.debug(
-                #    "HIT! %s cards with a value of %s",
-                #    len(player.hand.l_cards),
-                #    player.hand.get_value(),
-                # )
                 my_game.give_card(player)
                 player.check()
             else:
                 player.stopped = True
-                # logging.info("STOP! %s cards with a value of %s. Surival rate: %s",\
-                # len(player.hand.l_cards),player.hand.get_value(),\
-                # automate(cards_string,safeness,mytree)[1]) #TODO change this
                 logging.debug(
                     "STOP! %s cards with a value of %s. Surival rate: %s",
                     len(player.hand.l_cards),
@@ -73,20 +55,12 @@ def simple(safeness: float, mytree: tree.Tree) -> bool:
                 logging.debug([child.val for child in mytree.children])
         if not croup.is_out and not croup.stopped:
             croup.play(my_game)
-    logging.info("\033[31m" + "--------------------")
+    logging.debug("\033[31m" + "--------------------")
     lost = False
     if player.is_out or (
         player.hand.get_value() < croup.hand.get_value() and not croup.is_out
     ):
-    if player.is_out or (
-        player.hand.get_value() < croup.hand.get_value() and not croup.is_out
-    ):
         lost = True
-        logging.info(
-            "Player lost because he has %s and croupier has %s" + "\033[0m",
-            player.hand.get_value(),
-            croup.hand.get_value(),
-        )
         logging.debug(
             "\033[31m"
             + "Player lost because he has %s and croupier has %s"
@@ -158,8 +132,9 @@ def contest(n: int):
     for _ in tqdm.tqdm(range(n)):
         if simple(0.45, mytree):
             lost += 1
+    mytree = mytree.root
     print(f"Winrate: {(1 - lost/n)*100}")
 
 
 if __name__ == "__main__":
-    contest(10000000)
+    contest(1000000)
