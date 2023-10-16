@@ -159,7 +159,7 @@ class Croupier:
         """
         self.check(current_game)
         if not self.is_out and not self.stopped:
-            if self.hand.get_value() < 17:
+            if self.hand.get_value() <= 17:
                 if not HEADLESS:
                     print(INFO, "Croupier pioche.", col.Style.RESET_ALL)
                 current_game.give_card(self)
