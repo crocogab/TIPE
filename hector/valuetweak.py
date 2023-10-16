@@ -129,9 +129,16 @@ def contest(number: int):
     lost = 0
     for _ in tqdm.tqdm(range(number)):
         if simple(0.45, mytree):
+            with open("winrate.log", "a", encoding="utf-8") as file:
+                file.write("0\n")
             lost += 1
+        else:
+            with open("winrate.log", "a", encoding="utf-8") as file:
+                file.write("1\n")
     mytree = mytree.root
     print(f"Winrate: {(1 - lost/number)*100}")
+    with open("winrate", "a", encoding="utf-8") as file:
+        file.write(f"Winrate: {(1 - lost/number)*100}\n")
 
 
 if __name__ == "__main__":
