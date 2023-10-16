@@ -362,10 +362,10 @@ def game(players: list):
         )
 
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "game":
-        HEADLESS = False
-        hector = Player(Hand(0, []), 0)
-        gabriel = Player(Hand(0, []), 1)
-        croupier = Croupier(Hand(0, []), 2)
-        game([hector, gabriel, croupier])
+# if __name__ == "__main__":
+#     if len(sys.argv) > 1 and sys.argv[1] == "game":
+#         HEADLESS = False
+#         hector = Player(Hand(0, []), 0)
+#         gabriel = Player(Hand(0, []), 1)
+#         croupier = Croupier(Hand(0, []), 2)
+#         game([hector, gabriel, croupier])
