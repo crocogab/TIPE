@@ -20,5 +20,4 @@ jobs:
           pip install pylint colorama
       - name: Analysing the code with pylint
         run: |
-          pylint blackjack.py 
           pylint ./hector
