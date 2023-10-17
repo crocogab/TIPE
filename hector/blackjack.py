@@ -64,7 +64,7 @@ class Hand:
         string = ""
         for card in self.l_cards:
             string += str(card.real_value()) + ","
-        return string
+        return string[:-1]
 
     def get_bot_hand(self):
         """Fonction permettant au bot d'obtenir la liste des cartes justes en int"""
@@ -360,12 +360,3 @@ def game(players: list):
         print(
             f"Croupier avec le jeu : {my_croupier.hand} total = {my_croupier.hand.get_value()}"
         )
-
-
-# if __name__ == "__main__":
-#     if len(sys.argv) > 1 and sys.argv[1] == "game":
-#         HEADLESS = False
-#         hector = Player(Hand(0, []), 0)
-#         gabriel = Player(Hand(0, []), 1)
-#         croupier = Croupier(Hand(0, []), 2)
-#         game([hector, gabriel, croupier])
