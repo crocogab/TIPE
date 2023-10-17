@@ -5,7 +5,7 @@ from mutation import *
 from scaling import *
 from sharing import *
 from math import floor
-
+import uuid
 
 ############ Paramètres #############
 
@@ -50,6 +50,7 @@ def generation(list_individus,gen_nb,cluster_list):
         for i in range(NB_INDIVIDUS//4):
             """ un quart est muté"""
             i1=mutation(list_individus[0])
+            i1.name=uuid.uuid4() #ordre des instructions est important ici pour ne pas retirer mauvais elements
 
             remove_individu(list_individus[0],clusters)
             add_individu(i1,clusters)
@@ -60,6 +61,9 @@ def generation(list_individus,gen_nb,cluster_list):
         for i in range(NB_INDIVIDUS//8):
             """ un quart est croisé"""
             i1,i2=croisement(list_individus[0],list_individus[NB_INDIVIDUS-len(list_conserv)-1])
+            
+            i1.name=uuid.uuid4()
+            i2.name=uuid.uuid4()
 
             remove_individu(list_individus[0],clusters)
             add_individu(i1,clusters)
@@ -68,6 +72,8 @@ def generation(list_individus,gen_nb,cluster_list):
             remove_individu((list_individus[NB_INDIVIDUS-len(list_conserv)-1]),clusters)
             add_individu(i2,clusters)
 
+            
+
             list_conserv.append(i1)
             list_conserv.append(i2)
             list_individus.pop(0)
@@ -75,10 +81,7 @@ def generation(list_individus,gen_nb,cluster_list):
         
   
         ### Stochastic remainder without replacement selection + sharing
-        if gen_nb>1:
-          for i in range(len(list_conserv)):
-            print(i)
-            print(individu_clusters(list_conserv[i],clusters)[0])
+        
 
 
         liste_finale=[]
@@ -125,13 +128,14 @@ def generation(list_individus,gen_nb,cluster_list):
     
         #############
     
-        if gen_nb%10==0:
+        if gen_nb%5==0:
             """On enregistre sur fichier json pour save le training"""
             
             individu_json={
                 'nb_generation':gen_nb,
                 'fitness_moyenne':moy_fitness,
                 'chromosomes':[''.join(map(str,individu.chromosomes)) for individu in liste_finale]
+              
             }
             with open(r"training.json", "w") as f:
                 f.write(json.dumps(individu_json, indent=4))
@@ -149,6 +153,7 @@ def generate():
     for s in range(NB_INDIVIDUS):
         i1=Individu()
         i1.random_init()
+        i1.name=uuid.uuid4()
         i1.evaluate()
         list_individus.append(i1)
     clusters=init_clusters(list_individus)
