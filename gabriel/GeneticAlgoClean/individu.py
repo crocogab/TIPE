@@ -15,6 +15,7 @@ class Individu():
     def __init__(self) -> None:
         self.chromosomes = [0 for _ in range(190)]
         self.fitness=0
+        self.name='' #identifiant unique permet de conserver les memes individus dans plusieurs processus
         
     
     
@@ -127,3 +128,4 @@ class Individu():
                 count+=1
             
         self.fitness= count/PRECISION
+        
