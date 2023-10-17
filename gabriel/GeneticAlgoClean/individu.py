@@ -68,6 +68,9 @@ class Individu():
                     total+=10
                 else:
                     total+=1
+                    tab.remove(1)
+                    tab.append(-1)
+                    tab.append(2)
                     
             else:
                 total+=card
@@ -85,8 +88,8 @@ class Individu():
       
       while p_in_game or c_in_game :
       
-    
-        
+        print(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
+        print(self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0]))
         choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
         
             
@@ -121,8 +124,8 @@ class Individu():
         winner=True
         
         
-      print(f"[DEBUG]: player_list : {player_list} \n croupier_list :{croupier_list} \n Value_p :{self.calculate_val(player_list)} \n Value p :{self.calculate_val(croupier_list)} \n WINNER : {winner} \n")
-      time.sleep(0.5)
+      #print(f"[DEBUG]: player_list : {player_list} \n croupier_list :{croupier_list} \n Value_p :{self.calculate_val(player_list)} \n Value p :{self.calculate_val(croupier_list)} \n WINNER : {winner} \n")
+      
       return winner
     
 
