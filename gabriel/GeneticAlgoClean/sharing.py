@@ -79,11 +79,11 @@ def add_individu(i1:Individu,clusters:list):
 
 
 def remove_individu(i1:Individu,clusters:list):
-  for i in range(len(clusters)):
+  for i in range(len(clusters)): # a checker si marche bien
     if i1.name in clusters[i].individus_name:
       j=clusters[i].individus_name.index(i1.name)
-      clusters[i].individus_name.remove(j)
-      clusters[i].individus.remove(j)
+      clusters[i].individus_name.remove(i1.name)
+      clusters[i].individus.pop(j)
     
     return None
           
