@@ -1,6 +1,7 @@
 import random 
 import json
 import fastrand
+import time
 
 
 with open(r'config.json') as config_file:
@@ -67,57 +68,62 @@ class Individu():
                     total+=10
                 else:
                     total+=1
-                    tab.remove(1)
-                    #retirer l'as pour qu'il ne soit plus compté
-                    tab.append(2)
-                    tab.append(-1)
+                    
             else:
                 total+=card
         return total
     
     def play(self):
-        """Joue un 1v1 contre le croupier en fonction de ses chromosomes et voit si il gagne"""
+      """Joue un 1v1 contre le croupier en fonction de ses chromosomes et voit si il gagne"""
         
-        in_game=True
-        p_in_game=True
-        c_in_game=True
-        winner=False
-        player_list=[PROBA_ARRAY[fastrand.pcg32bounded(13)]]
-        croupier_list=[PROBA_ARRAY[fastrand.pcg32bounded(13)]]
-        while in_game:
-            
+      
+      p_in_game=True
+      c_in_game=True
+      winner=False
+      player_list=[PROBA_ARRAY[fastrand.pcg32bounded(13)]]
+      croupier_list=[PROBA_ARRAY[fastrand.pcg32bounded(13)]]
+      
+      while p_in_game or c_in_game :
+      
     
+        
+        choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
+        
+            
+        if self.chromosomes[choice]==1 and p_in_game :
+          player_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
+         
+        else:
+          p_in_game=False
+        
+        
+        if self.calculate_val(croupier_list)<17 and c_in_game:
+          croupier_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
+  
+        else:
+          c_in_game=False
+        
+        if self.calculate_val(player_list)>21:
+          p_in_game=False
+        if self.calculate_val(croupier_list)>21:
+          c_in_game=False
+        
 
-            choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
-           
             
-            if self.chromosomes[choice]==1 and p_in_game:
-                   player_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
-            else:
-                p_in_game=False
-            
-            if self.calculate_val(croupier_list)<17 and c_in_game:
-                croupier_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
-                
-            else:
-                c_in_game=False
-            
-            if not p_in_game and not c_in_game:
-                in_game=False
-                if self.calculate_val(player_list)<21 and self.calculate_val(player_list)>self.calculate_val(croupier_list):
-                    winner=True
-            elif self.calculate_val(croupier_list)>21:
-                winner=True
-                in_game=False
-            elif self.calculate_val(player_list)>21:
-                winner=False
-                in_game=False
-            elif self.calculate_val(player_list)==21:
-                winner=True
-                in_game=False
+      
+          
+      if self.calculate_val(player_list)<=21 and self.calculate_val(player_list)>=self.calculate_val(croupier_list):
+        winner=True
+      elif self.calculate_val(croupier_list)>21:
+        winner=True
+        
+      elif self.calculate_val(player_list)==21:
+        winner=True
         
         
-        return winner
+      print(f"[DEBUG]: player_list : {player_list} \n croupier_list :{croupier_list} \n Value_p :{self.calculate_val(player_list)} \n Value p :{self.calculate_val(croupier_list)} \n WINNER : {winner} \n")
+      time.sleep(0.5)
+      return winner
     
 
     def evaluate(self):
