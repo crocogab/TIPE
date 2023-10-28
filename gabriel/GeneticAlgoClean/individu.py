@@ -71,6 +71,9 @@ class Individu():
                     tab.remove(1)
                     tab.append(-1)
                     tab.append(2)
+                    if 1 in tab: #evite le bug des doubles 1
+                      tab.remove(1)
+                      tab.append(10)
                     
             else:
                 total+=card
@@ -88,9 +91,9 @@ class Individu():
       
       while p_in_game or c_in_game :
       
-        print(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
-        print(self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0]))
-        choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
+        
+        if p_in_game:
+          choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
         
             
         if self.chromosomes[choice]==1 and p_in_game :
@@ -110,6 +113,8 @@ class Individu():
           p_in_game=False
         if self.calculate_val(croupier_list)>21:
           c_in_game=False
+        
+  
         
 
             
