@@ -3,7 +3,7 @@ from individu5 import *
 import json
 
 
-with open(r'C:\Users\croco\Documents\GitHub\TIPE\gabriel\training.json') as training_file:
+with open(r'training.json') as training_file:
     data = json.load(training_file)
 
 
@@ -79,7 +79,13 @@ for i in range(1,11):
             tableau[12-j][i].configure(bg="red")
             index+=1
         
-    
-
-
+best_individu=liste_finale[index_b]
+print(f'[DEBUG]: C:2  AS     19 {best_individu.chromosomes[best_individu.convert(19,True,2)]}')
+print(f'[DEBUG]: C:AS PAS AS 15 {best_individu.chromosomes[best_individu.convert(15,False,1)]}')
+print(f'[DEBUG]: C:6  AS     13 {best_individu.chromosomes[best_individu.convert(13,True,6)]}')
+print(f'[DEBUG]: C:3  PAS AS 19 {best_individu.chromosomes[best_individu.convert(19,False,3)]}')
+print(f'[DEBUG]: C:3  PAS AS 18 {best_individu.chromosomes[best_individu.convert(18,False,3)]}')
+print(f'[DEBUG]: C:3  PAS AS 17 {best_individu.chromosomes[best_individu.convert(17,False,3)]}')
+print(f'[DEBUG]: C:AS AS     15 {best_individu.chromosomes[best_individu.convert(15,True,1)]}')
+print(f'[DEBUG]: C:AS AS     17 {best_individu.chromosomes[best_individu.convert(17,True,1)]}')
 fenetre.mainloop()  
