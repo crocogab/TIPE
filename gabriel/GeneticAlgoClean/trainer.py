@@ -1,6 +1,6 @@
 from clean_genetic_algorithm import generation
 from individu import Individu
-import sharing
+from sharing import init_clusters,fusion_clusters
 import json
 
 with open(r'training.json') as training_file:
@@ -23,7 +23,7 @@ for elem in list_chromosomes:
     i1.evaluate()
     liste_finale.append(i1)
 
-clusters=init_clusters(list_individus)
+clusters=init_clusters(liste_finale)
 fusion_clusters(clusters)
 
 generation(liste_finale, data['nb_generation'],clusters)
