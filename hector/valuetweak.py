@@ -60,7 +60,7 @@ def simple(safeness: float, mytree: tree.Tree) -> bool:
     logging.debug("\033[31m" + "--------------------")
     lost = False
     if player.is_out or (
-        player.hand.get_value() <= croupier.hand.get_value() and not croupier.is_out
+        player.hand.get_value() < croupier.hand.get_value() and not croupier.is_out
     ):
         lost = True
         logging.debug(
@@ -70,6 +70,9 @@ def simple(safeness: float, mytree: tree.Tree) -> bool:
             player.hand.get_value(),
             croupier.hand.get_value(),
         )
+    elif player.hand.get_value() == croupier.hand.get_value():
+    # if the player and the croupier have the same value, we replay
+        lost = simple(safeness, mytree)
     else:
         logging.debug(
             "\033[32m" + "Player won because he has %s and croupier has %s" + "\033[0m",
