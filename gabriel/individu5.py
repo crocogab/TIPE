@@ -3,7 +3,7 @@ from math import * #partie entiere + pi + tangente
 import json
 import sys
 
-with open('C:/Users/croco/Documents/GitHub/TIPE/gabriel/config.json') as config_file:
+with open(r'config.json') as config_file:
     data = json.load(config_file)
 
 sys.setrecursionlimit(1000000) #pour éviter les erreurs de récursion
@@ -74,50 +74,69 @@ class Individu():
                 else:
                     total+=1
                     tab.remove(1)
-                    #retirer l'as pour qu'il ne soit plus compté
-                    tab.append(2)
                     tab.append(-1)
+                    tab.append(2)
+                    if 1 in tab: #evite le bug des doubles 1
+                      tab.remove(1)
+                      tab.append(10)
+                    
             else:
                 total+=card
         return total
     
     def play(self):
-        """Joue un 1v1 contre le croupier en fonction de ses chromosomes et voit si il gagne"""
-        in_game=True
-        p_in_game=True
-        c_in_game=True
-        winner=False
-        player_list=[random.choice(PROBA_ARRAY)]
-        croupier_list=[random.choice(PROBA_ARRAY)]
-        while in_game:
-            
-
-            choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
-           
-            
-            if self.chromosomes[choice]==1 and p_in_game:
-                   player_list.append(random.choice(PROBA_ARRAY))
-            else:
-                p_in_game=False
-            
-            if self.calculate_val(croupier_list)<17 and c_in_game:
-                croupier_list.append(random.choice(PROBA_ARRAY))
-            else:
-                c_in_game=False
-            
-            if not p_in_game and not c_in_game:
-                in_game=False
-                if self.calculate_val(player_list)<21 and self.calculate_val(player_list)>self.calculate_val(croupier_list):
-                    winner=True
-            elif self.calculate_val(player_list)>21:
-                winner=False
-                in_game=False
-            elif self.calculate_val(player_list)==21:
-                winner=True
-                in_game=False
+      """Joue un 1v1 contre le croupier en fonction de ses chromosomes et voit si il gagne"""
         
-    
-        return winner
+      
+      p_in_game=True
+      c_in_game=True
+      winner=False
+      player_list=[random.choice(PROBA_ARRAY)]
+      croupier_list=[random.choice(PROBA_ARRAY)]
+      
+      while p_in_game or c_in_game :
+      
+        
+        if p_in_game:
+          choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
+        
+            
+        if self.chromosomes[choice]==1 and p_in_game :
+          player_list.append(random.choice(PROBA_ARRAY))
+         
+        else:
+          p_in_game=False
+        
+        
+        if self.calculate_val(croupier_list)<17 and c_in_game:
+          croupier_list.append(random.choice(PROBA_ARRAY))
+  
+        else:
+          c_in_game=False
+        
+        if self.calculate_val(player_list)>21:
+          p_in_game=False
+        if self.calculate_val(croupier_list)>21:
+          c_in_game=False
+        
+  
+        
+
+            
+      
+          
+      if self.calculate_val(player_list)<=21 and self.calculate_val(player_list)>=self.calculate_val(croupier_list):
+        winner=True
+      elif self.calculate_val(croupier_list)>21:
+        winner=True
+        
+      elif self.calculate_val(player_list)==21:
+        winner=True
+        
+        
+      #print(f"[DEBUG]: player_list : {player_list} \n croupier_list :{croupier_list} \n Value_p :{self.calculate_val(player_list)} \n Value p :{self.calculate_val(croupier_list)} \n WINNER : {winner} \n")
+      
+      return winner
     
 
     def evaluate(self):
@@ -240,7 +259,7 @@ def generation(list_individus,gen_nb):
                 'fitness_moyenne':moy_fitness,
                 'chromosomes':[''.join(map(str,individu.chromosomes)) for individu in liste_finale]
             }
-            with open(r"C:\Users\croco\Documents\GitHub\TIPE\gabriel\training.json", "w") as f:
+            with open(r"training.json", "w") as f:
                 f.write(json.dumps(individu_json, indent=4))
 
 
