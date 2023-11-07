@@ -4,8 +4,8 @@ from math import sqrt
 
 #inutile pour les petites populations
 
-d_min=4
-d_max=2
+d_min=2
+d_max=0.5
 alpha=0.8
 
 class cluster:
