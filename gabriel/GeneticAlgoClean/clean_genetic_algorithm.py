@@ -77,7 +77,7 @@ def generation(list_individus,gen_nb,cluster_list):
             list_conserv.append(i1)
             list_conserv.append(i2)
             list_individus.pop(0)
-            list_individus.pop(NB_INDIVIDUS-len(list_conserv))
+            list_individus.pop(NB_INDIVIDUS-len(list_conserv)-1)
         
   
         ### Stochastic remainder without replacement selection + sharing
