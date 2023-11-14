@@ -2,6 +2,7 @@ import random
 import json
 import fastrand
 import time
+from multiprocessing.pool import ThreadPool
 
 
 with open(r'config.json') as config_file:
@@ -136,10 +137,19 @@ class Individu():
 
     def evaluate(self):
         """evalue le chromosome et retourne une valeur numerique"""
-        count=0
-        for _ in range(PRECISION):
-            if self.play():
-                count+=1
-            
-        self.fitness= count/PRECISION
         
+        
+        def aux(j):
+          count=0
+          for _ in range(j):
+            if self.play():
+              count+=1
+          return count
+              
+      
+        pool = ThreadPool(processes=5)
+        async_result = pool.apply_async(aux, (PRECISION,))
+        return_val = async_result.get()
+    
+        
+        self.fitness= return_val/PRECISION
