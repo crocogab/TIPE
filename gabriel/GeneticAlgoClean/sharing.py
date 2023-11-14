@@ -96,25 +96,16 @@ def individu_clusters(i1: Individu, clusters: list):
     for i in range(len(clusters)):
       if i1.name in clusters[i].individus_name:
         return (len(clusters[i].individus),clusters[i])
-    for i in range(len(clusters)):
-      print(clusters[i].individus_name)
+    #for i in range(len(clusters)):
+    #   print(clusters[i].individus_name)
     print( f"Error individu not found {type(clusters[i])} {i1.name}") # cochon -> debug
     
 
 
 def sharing(i1:Individu,clusters:list):
   """ Renvoie la valeur du sharing pour un individu """
-  
-  nc,c=individu_clusters(i1,clusters)
-  return nc*(1-((distance_liste(i1.chromosomes,c.centre))/(2*d_max))**alpha)
-
-    
-
-                
-                
-
-    
-                
-
-        
-
+  try:
+    nc,c=individu_clusters(i1,clusters)
+    return nc*(1-((distance_liste(i1.chromosomes,c.centre))/(2*d_max))**alpha)
+  except: #permet d'eviter crash total si bug -> cochon
+    return 1
