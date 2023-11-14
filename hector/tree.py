@@ -1,12 +1,9 @@
 import time
-import sys
 import logging
 
-# SAFENESS = 0.5
 # SAFENESS represents the minimum survival rate of a node's children to be considered a good node
 # the rate is calculated by dividing the number of children
 #  with a value < 21 by the total number of children
-
 
 class Tree:
     """
@@ -36,10 +33,6 @@ class Tree:
         for child in self.children:
             child.survival_meth()
 
-    def is_empty(self):
-        """returns True if the node is empty"""
-        return self.val == -1
-
     def navigate(self, next_node: int):
         """returns the child with the value next_node if it exists, else returns -1"""
         try:
@@ -51,7 +44,8 @@ class Tree:
                 f"Invalid child value {next_node}, childs are %s",
                 [child.val for child in self.children],
             )
-            return Tree(-1, -1)
+            # quit the program if the child does not exist 
+            exit(1)
         return -1
 
     def shouldtake(self, safeness: float):
@@ -124,7 +118,6 @@ def main():
         while not next_card.isdigit() or int(next_card) not in range(1, 11):
             next_card = input("Entrée incorrecte : ")
         mytree = mytree.navigate(int(next_card))  # not sure how it worked before
-        mytree = mytree.navigate(int(next_card))  # not sure how it worked before
         print(
             [child.val for child in mytree.children],
             mytree.virtualchildrenscount,
@@ -152,12 +145,5 @@ def automate(card_string: str, safeness: float) -> tuple:
         mytree = mytree.navigate(card)
     return mytree.shouldtake(safeness), mytree.survival
 
-
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "game":
-        main()
-    elif len(sys.argv) > 1:
-        automate(sys.argv[1].split(","), float(sys.argv[2]))
-        logging.debug("sys.argv[1]: %s", sys.argv[1])
-    else:
-        automate([10], 0.5)
+    main()
