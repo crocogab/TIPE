@@ -93,20 +93,16 @@ class Individu():
       while p_in_game or c_in_game :
       
         
-        if p_in_game:
+        if p_in_game: #le joueur decide si il joue ou stop
           choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
-        
-            
-        if self.chromosomes[choice]==1 and p_in_game :
-          player_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
-         
-        else:
-          p_in_game=False
+          if self.chromosomes[choice]==1 :
+            player_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
+          else:
+            p_in_game=False
         
         
         if self.calculate_val(croupier_list)<17 and c_in_game:
           croupier_list.append(PROBA_ARRAY[fastrand.pcg32bounded(13)])
-  
         else:
           c_in_game=False
         
@@ -114,16 +110,10 @@ class Individu():
           p_in_game=False
         if self.calculate_val(croupier_list)>21:
           c_in_game=False
-        
-  
-        
-
-            
-      
-          
+         
       if self.calculate_val(player_list)<=21 and self.calculate_val(player_list)>=self.calculate_val(croupier_list):
         winner=True
-      elif self.calculate_val(croupier_list)>21:
+      elif self.calculate_val(croupier_list)>21 and self.calculate_val(player_list)<=21:
         winner=True
         
       elif self.calculate_val(player_list)==21:
