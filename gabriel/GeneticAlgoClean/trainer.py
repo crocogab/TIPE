@@ -26,7 +26,7 @@ for elem in list_chromosomes:
 
 clusters=init_clusters(liste_finale)
 fusion_clusters(clusters)
-
+print('Cluster fusionnes :)\n')
 with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
     executor.submit(generation,liste_finale, data['nb_generation'],clusters,)
 
