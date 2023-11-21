@@ -2,6 +2,7 @@ from clean_genetic_algorithm import generation
 from individu import Individu
 from sharing import init_clusters,fusion_clusters
 import json
+import concurrent.futures
 
 with open(r'training.json') as training_file:
     data = json.load(training_file)
@@ -26,5 +27,7 @@ for elem in list_chromosomes:
 clusters=init_clusters(liste_finale)
 fusion_clusters(clusters)
 
-generation(liste_finale, data['nb_generation'],clusters)
+with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
+    executor.submit(generation,liste_finale, data['nb_generation'],clusters,)
+
 
