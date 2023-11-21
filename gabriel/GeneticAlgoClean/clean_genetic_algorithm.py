@@ -5,6 +5,7 @@ from mutation import *
 from scaling import *
 from sharing import *
 from math import floor
+import concurrent.futures
 import uuid
 
 ############ Paramètres #############
@@ -162,7 +163,10 @@ def generate():
     generation(list_individus,1,clusters)
         
 if __name__=='__main__':
-    generate()
+  with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+    executor.submit(generate,)
+   
+  
 
 
 
