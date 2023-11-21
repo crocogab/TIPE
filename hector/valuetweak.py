@@ -118,7 +118,7 @@ def print_surivals(mytree: tree.Tree):
 
 
 def safeness_iterate(
-    iterations: int = 10000, step: float = 0.0625, safeness: float = 0
+    iterations: int = 10000, step: float = 0.0625, safeness: float = 0, stop = 1
 ):
     """
     repeat simple with different safeness values to find the best one. Write the results in data.csv
@@ -131,10 +131,10 @@ def safeness_iterate(
     mydeck = tree.make_my_deck()
     mytree = tree.create_game_tree(tree.Tree(0, 0), 0, mydeck)
     mytree.survival_meth()
-    while safeness < 1:
+    while safeness < stop:
         for _ in range(iterations):
             if simple(safeness, mytree):
-                with open("data.csv", "a", encoding="utf-8") as file:
+                with open("data2.csv", "a", encoding="utf-8") as file:
                     file.write(f"0,{safeness}\n")
             else:
                 with open("data.csv", "a", encoding="utf-8") as file:
@@ -156,7 +156,7 @@ def contest(iterations: int):
     lost = 0
     # tqdm is used for the progress bar it's like a for loop but with a progress bar
     for _ in tqdm.tqdm(range(iterations)):
-        if simple(0.45, mytree):
+        if simple(0.4921875, mytree):
             lost += 1
     # navigate back to the root to avoid creating a new tree
     mytree = mytree.root
