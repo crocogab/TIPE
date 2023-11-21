@@ -151,7 +151,7 @@ class Croupier:
         self.check(current_game)
 
 
-class Player:
+class Player: #pylint: disable=too-few-public-methods
     """
     Classe du joueur
     choix: true = prend une carte, false = rester

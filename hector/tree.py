@@ -1,5 +1,6 @@
 import time
 import logging
+import sys
 
 # SAFENESS represents the minimum survival rate of a node's children to be considered a good node
 # the rate is calculated by dividing the number of children
@@ -44,8 +45,8 @@ class Tree:
                 f"Invalid child value {next_node}, childs are %s",
                 [child.val for child in self.children],
             )
-            # quit the program if the child does not exist 
-            exit(1)
+            # quit the program if the child does not exist
+            sys.exit(-1)
         return -1
 
     def shouldtake(self, safeness: float):
