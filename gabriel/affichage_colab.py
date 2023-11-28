@@ -1,3 +1,4 @@
+from pickle import NONE
 import sys
 sys.path.insert(1, '/content/TIPE/gabriel/GeneticAlgoClean')
 from individu import *
@@ -21,7 +22,7 @@ for chromosome in data['chromosomes']:
     list_chromosomes.append(chromo_actu)
 
 index_b=0
-maxi=0
+
 threads=[]
 for elem in list_chromosomes:
     i1=Individu()
@@ -35,20 +36,26 @@ for elem in list_chromosomes:
 for thread in threads:
         thread.join()
 uiid_max=None
-for i1 in liste_finale:
-  if i1.fitness>maxi:
-        maxi=i1.fitness
-        uiid_max=i1.name
 
-for i in range(len(liste_finale)):
-  if liste_finale[i].name==uiid_max:
-    index_b=i      
+lf2=liste_finale.copy()
+lf2.sort(key=lambda x: x.fitness,reverse=True)
 
-    
+# for i1 in liste_finale:
+#   if i1.fitness>maxi:
+#         maxi=i1.fitness
+#         uiid_max=i1.name
 
-print(f"[DEBUG] Le meilleur individu est l'individu numéro {index_b}")
+# for i in range(len(liste_finale)):
+#   if liste_finale[i].name==uiid_max:
+#     index_b=i      
 
-print('[DEBUG]: fitness_max = ', maxi)
+a=[liste_finale.index(elem) for elem in lf2]
+
+   
+for i in range(10):
+  print(f'Classement {i+1} : {a[i]}')
+
+print('[DEBUG]: fitness_max = ', lf2[0])
 
 
 
