@@ -47,6 +47,7 @@ class Tree:
             )
             # quit the program if the child does not exist
             sys.exit(-1)
+        # if caller is not the create_game_tree function, return -1
         return -1
 
     def shouldtake(self, safeness: float):
@@ -89,9 +90,9 @@ def create_game_tree(current: Tree, depth: int, deck: list):
     return current
 
 
-def make_my_deck():
+def make_my_deck()->list[int]:
     """
-    returns a list of cards
+    returns a list of cards (int)
     """
     cards = []
     for i in range(13):
