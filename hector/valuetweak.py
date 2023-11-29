@@ -1,10 +1,10 @@
 # Find the best SAFENESS value to use in hector/tree.py to get the best winrate.
 import logging
+import time
+import multiprocessing
 import tqdm
 import tree
 from blackjack import Player, Croupier, Game, Hand, make_deck
-import time
-import multiprocessing
 
 logging.basicConfig(level=logging.INFO)
 
@@ -106,10 +106,7 @@ def automate(card_string: str, safeness: float, my_tree: tree.Tree) -> tuple:
     for card in card_list:
         my_tree = my_tree.navigate(card)
     # return the decision
-    try:
-        return my_tree.shouldtake(safeness), my_tree.survival
-    except AttributeError:
-        print(card_string, my_tree)
+    return my_tree.shouldtake(safeness), my_tree.survival
 
 
 def print_surivals(mytree: tree.Tree):
@@ -186,9 +183,8 @@ def contest(iterations: int):
 
 if __name__ == "__main__":
     # compute a total winrate from multiple contests run in parallel with multiprocessing
-    winrate = 0
-    iteration_per_thread = 1000000000
+    ITERATION_PER_THREADS = 1000000000
     threads = multiprocessing.cpu_count()
     with multiprocessing.Pool(threads) as p:
-        winrate = sum(p.map(contest, [iteration_per_thread]*threads))/threads
-    print(f"Total winrate: {winrate}")
+        WINRATE = sum(p.map(contest, [ITERATION_PER_THREADS]*threads))/threads
+    print(f"Total winrate: {WINRATE}")

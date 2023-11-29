@@ -1,2 +1,2 @@
 [pylint.messages control]
-disable=missing-module-docstring,fixme
+disable=missing-module-docstring,fixme,similarities
