@@ -55,17 +55,8 @@ a=[liste_finale.index(elem) for elem in lf2]
 for i in range(10):
   print(f'Classement {i+1} : {a[i]}')
 
-print('[DEBUG]: fitness_max = ', lf2[0])
+print('[DEBUG]: fitness_max = ', lf2[0].fitness)
 
 
 
 best_individu=liste_finale[index_b]
-print(f'[DEBUG]: C:2  AS     19 {best_individu.chromosomes[best_individu.convert(19,True,2)]}')
-print(f'[DEBUG]: C:AS PAS AS 15 {best_individu.chromosomes[best_individu.convert(15,False,1)]}')
-print(f'[DEBUG]: C:6  AS     13 {best_individu.chromosomes[best_individu.convert(13,True,6)]}')
-print(f'[DEBUG]: C:3  PAS AS 19 {best_individu.chromosomes[best_individu.convert(19,False,3)]}')
-print(f'[DEBUG]: C:3  PAS AS 18 {best_individu.chromosomes[best_individu.convert(18,False,3)]}')
-print(f'[DEBUG]: C:3  PAS AS 17 {best_individu.chromosomes[best_individu.convert(17,False,3)]}')
-print(f'[DEBUG]: C:AS AS     15 {best_individu.chromosomes[best_individu.convert(15,True,1)]}')
-print(f'[DEBUG]: C:AS AS     17 {best_individu.chromosomes[best_individu.convert(17,True,1)]}')
-
