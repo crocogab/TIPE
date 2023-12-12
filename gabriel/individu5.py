@@ -67,21 +67,26 @@ class Individu():
     
     def calculate_val(self,tab:list):
         total=0
+        has_use=False
+        tab.sort(reverse=True)
         for card in tab:
             if card==1:
-                if total+10<=21:
-                    total+=10
-                else:
+                if total+10>21 and not has_use:
                     total+=1
-                    tab.remove(1)
-                    tab.append(-1)
-                    tab.append(2)
-                    if 1 in tab: #evite le bug des doubles 1
-                      tab.remove(1)
-                      tab.append(10)
+                    has_use=True
                     
-            else:
-                total+=card
+                else:
+                    total+=10
+            
+            else:    
+                total+=card             
+        if has_use:
+            tab.remove(1)
+            tab.append(2)
+            tab.append(-1)
+            for _ in range(tab.count(1)):
+                tab.remove(1)
+                tab.append(10)
         return total
     
     def play(self):
@@ -98,39 +103,36 @@ class Individu():
       
         
         if p_in_game:
-          choice=self.convert(self.calculate_val(player_list),(1 in player_list),croupier_list[0])
-        
+            val=self.calculate_val(player_list)
+            choice=self.convert(val,(1 in player_list),croupier_list[0])
+            if self.chromosomes[choice]==1:
+                player_list.append(random.choice(PROBA_ARRAY))
+            else:
+                p_in_game=False
             
-        if self.chromosomes[choice]==1 and p_in_game :
-          player_list.append(random.choice(PROBA_ARRAY))
-         
-        else:
-          p_in_game=False
-        
-        
-        if self.calculate_val(croupier_list)<17 and c_in_game:
-          croupier_list.append(random.choice(PROBA_ARRAY))
-  
-        else:
-          c_in_game=False
-        
-        if self.calculate_val(player_list)>21:
-          p_in_game=False
-        if self.calculate_val(croupier_list)>21:
-          c_in_game=False
-        
-  
-        
+        croupier_val=self.calculate_val(croupier_list)
+        player_val=self.calculate_val(player_list)
 
-            
-      
-          
-      if self.calculate_val(player_list)<=21 and self.calculate_val(player_list)>=self.calculate_val(croupier_list):
-        winner=True
-      elif self.calculate_val(croupier_list)>21:
-        winner=True
+        if croupier_val<17 and c_in_game:
+          croupier_list.append(random.choice(PROBA_ARRAY))
+        else:
+          c_in_game=False
         
-      elif self.calculate_val(player_list)==21:
+        
+        if player_val >21:
+          p_in_game=False
+        if croupier_val>21:
+          c_in_game=False
+        if self.calculate_val(croupier_list)==21 :
+                return False
+        if self.calculate_val(player_list)==21:
+                return True
+      
+      if player_val==21:
+        winner=True
+      elif player_val<=21 and player_val>=croupier_val:
+        winner=True
+      elif croupier_val>21 and player_val<=21:
         winner=True
         
         
