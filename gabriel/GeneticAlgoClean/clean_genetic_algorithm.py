@@ -7,6 +7,7 @@ from sharing import *
 from math import floor
 import concurrent.futures
 import uuid
+import matplotlib.pyplot as plt
 
 ############ Paramètres #############
 
@@ -26,7 +27,8 @@ def find(liste,val):
 #####################################
 
 def generation(list_individus,gen_nb,cluster_list):
- 
+  X_SCORE=[]
+  Y_GEN=[]
   clusters=cluster_list
   list_individus_n=list_individus
   for actual_gen in range(gen_nb):
@@ -97,6 +99,19 @@ def generation(list_individus,gen_nb,cluster_list):
       }
       with open(r"training.json", "w") as f:
         f.write(json.dumps(individu_json, indent=4))
+    
+    X_SCORE.append(moy_fitness)
+    Y_GEN.append(actual_gen)
+
+
+    if actual_gen%10==0:
+      """ On enregistre le graphique de progression"""
+      plt.xlabel="Fitness moyenne (comptée avec le scaling)"
+      plt.ylabel="Génération"
+      plt.plot(Y_GEN, X_SCORE)
+      plt.savefig('progression.png')
+    
+
     list_individus_n=liste_finale
     print(f'Generation : {actual_gen} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
 
