@@ -69,7 +69,7 @@ def generation(list_individus,gen_nb,cluster_list):
     k_exp=exp_scaling(actual_gen+1)
     total=0
     mi_value=[sharing(i1,clusters) for i1 in list_conserv]
-    print(f"[DEBUG]: tableau cree -> val max = {max(mi_value)}")
+    #print(f"[DEBUG]: tableau cree -> val max = {max(mi_value)}")
     for i in range(len(list_conserv)):
       total+=(((list_conserv[i].fitness)**k_exp)/mi_value[i])
     moy_fitness=total/NB_INDIVIDUS
