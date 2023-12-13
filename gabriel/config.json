@@ -1,7 +1,7 @@
 {
-    "precision": 20000,
+    "precision": 100000,
     "nb_iterations": 100,
-    "nb_individus": 2048,
+    "nb_individus": 256,
     "main_a_regarder": 2,
     "p_scaling": 0.08
 }
