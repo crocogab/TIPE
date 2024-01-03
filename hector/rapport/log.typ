@@ -10,7 +10,6 @@
   date: "November 14, 2023",
 )
 
-#bibliography("biblio.bib")
 #import "@preview/cetz:0.1.2": canvas, draw, tree
 
 = Règles
@@ -44,27 +43,17 @@ Nous avions besoin de pouvoir rapidement simuler des parties, de sorte a pouvoir
 
 == Arbre de jeu
 
-#let data = (
-  [A], ([B], [C], [D]), ([E], [F])
+
+== Problèmes recontrés
+=== Problème de performance
+La taille de l'arbre dépend de la profondeur de la partie (ie. le nombre de la carte dans la main d'un joueur avant la fin de la partie). Pour determiner une profondeur maximale, j'ai généré un grand nombre de partie, en adoptant une stratégie naïve (tirer des cartes jusqu'a perdre). J'ai simulé 200 000 000 de parties et obtenu les résultats suivants :
+#figure(
+  image("depth.png", width: 70%),
+  caption: [
+    Distribution du nombre de cartes nécéssaires à la fin d'une partie
+  ],
 )
-
-#canvas(length: 1cm, {
-  import draw: *
-
-  set-style(content: (padding: .2),
-    fill: gray.lighten(70%),
-    stroke: blue.lighten(70%))
-
-  tree.tree(data, spread: 2.5, grow: 1.5, draw-node: (node, _) => {
-    circle((), radius: .45, stroke: none)
-    content((), node.content)
-  }, draw-edge: (from, to, _) => {
-    line((a: from, number: .6, abs: true, b: to),
-         (a: to, number: .6, abs: true, b: from), mark: (end: ">"))
-  }, name: "tree")
-
-  // Draw a "custom" connection between two nodes
-  let (a, b) = ("tree.0-0-1", "tree.0-1-0",)
-  line((a: a, number: .6, abs: true, b: b), (a: b, number: .6, abs: true, b: a), mark: (end: ">", start: ">"))
-})
-Ci dessus, on représente une partie de l'arbre de jeu.
+J'ai donc choisi une profondeur maximale de 8. Il reste tout de même $52^8  = $ #calc.pow(52, 8) nœuds dans l'arbre. On regrouppe donc les cartes par valeur et on donne un poids a l'arrête qui sera décrémenté a chaque fois qu'on tire une carte de cette valeur. On obtient alors un arbre de taille #calc.pow(10,8), ce qui est beaucoup plus raisonnable. On a réduit la taille de l'arbre de 5 ordres de grandeur. On peut alors générer l'arbre en quelques secondes.
+=== Problème de conception
+La première version ne prenait pas en compte la première carte du croupier. On génère donc 10 arbres différents, un pour chaque valeur de la première carte du croupier. Cependant, avec l'implémentation actuelle, la première carte n'a pas d'influence sur le comportement idéal déterminé par le programme car la première carte du croupier n'agit pas sur la valeur seuil de la probabilité de dépasser 21 à la prochaine carte tirée. Il faut donc que je trouve un moyen de faire influer la première carte du croupier sur la valeur seuil. On m'a suggérer de faire une exploration exhaustive du graphe de jeu. Je pense qu'il est possible de trouver une fonction mathématique prenant en compte la première carte du croupier pour la valeur seuil. Je vais donc essayer de trouver cette fonction.
+Ou alors la probabilité de perdre du croupier doit etre calculée en fonction de la première carte du croupier. (pour la prendre en compte pour le choix du joueur)

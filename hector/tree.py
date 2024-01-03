@@ -64,7 +64,7 @@ def create_game_tree(current: Tree, depth: int, deck: list):
     depth: the number of iterations we've been through
     deck: list of ints representing cards.
     """
-    maxdepth = 6  # arbitrary value
+    maxdepth = 8
     if depth == maxdepth:
         return current
     for card in deck:

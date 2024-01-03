@@ -93,7 +93,7 @@ def automate(card_string: str, safeness: float, my_tree: tree.Tree) -> tuple:
     """
     returns true if a player should take a card and the survival rate of the node
     inputs:
-        card_string: str, the cards the player has
+        card_string: str, the cards the player has example: "1,2,3"
         safeness: float, the safeness value to use
         my_tree: tree.Tree, the tree to use
     outputs:
@@ -160,12 +160,7 @@ def contest(iterations: int):
     # mytree = tree.create_game_tree(tree.Tree(0, 0), 0, mydeck)
     # mytree.survival_meth()
     timestamp = time.time()
-    trees = {}
-    for i in range(1,11):
-        mydeck = tree.make_my_deck()
-        mydeck.remove(i)
-        trees[i] = tree.create_game_tree(tree.Tree(0, 0), 0, mydeck)
-        trees[i].survival_meth()
+    trees = tree_dict()
     lost = 0
     print("pre-iteration time:", time.time() - timestamp)
     # tqdm is used for the progress bar it's like a for loop but with a progress bar
@@ -181,9 +176,18 @@ def contest(iterations: int):
         file.write(f"Winrate: {(1 - lost/iterations)*100}\n")
     return (1 - lost/iterations)*100
 
+def tree_dict():
+    trees = {}
+    for i in range(1,11):
+        mydeck = tree.make_my_deck()
+        mydeck.remove(i)
+        trees[i] = tree.create_game_tree(tree.Tree(0, 0), 0, mydeck)
+        trees[i].survival_meth()
+    return trees
+
 if __name__ == "__main__":
     # compute a total winrate from multiple contests run in parallel with multiprocessing
-    ITERATION_PER_THREADS = 1000000000
+    ITERATION_PER_THREADS = 100000
     threads = multiprocessing.cpu_count()
     with multiprocessing.Pool(threads) as p:
         WINRATE = sum(p.map(contest, [ITERATION_PER_THREADS]*threads))/threads
