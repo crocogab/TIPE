@@ -71,6 +71,7 @@ for i in range(1,11):
             index+=1
     
 best_individu=liste_finale[index_b]
+best_individu.PRECISION=1000000
 best_individu.evaluate()
 print(f"[DEBUG]: fitness_max= ",best_individu.fitness)
 print(f'[DEBUG]: C:2  AS     19 {best_individu.chromosomes[best_individu.convert(19,True,2)]}')
