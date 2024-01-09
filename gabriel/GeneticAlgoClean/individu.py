@@ -122,9 +122,9 @@ class Individu():
           p_in_game=False
         if croupier_val>21:
           c_in_game=False
-        if self.calculate_val(croupier_list)==21 :
+        if croupier_val==21 :
                 return False
-        if self.calculate_val(player_list)==21:
+        if player_val==21:
                 return True
       
       if player_val==21:
@@ -144,19 +144,10 @@ class Individu():
 
     def evaluate(self):
         """evalue le chromosome et retourne une valeur numerique"""
+        count=0
         
+        for _ in range(PRECISION):
+          if self.play():
+            count+=1
         
-        def aux(j):
-          count=0
-          for _ in range(j):
-            if self.play():
-              count+=1
-          return count
-              
-      
-        pool = ThreadPool(processes=5)
-        async_result = pool.apply_async(aux, (PRECISION,))
-        return_val = async_result.get()
-    
-        
-        self.fitness= return_val/PRECISION
+        self.fitness= count/PRECISION
