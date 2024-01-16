@@ -78,6 +78,15 @@ Un individu sera représenté par plusieurs paramtres :
 
 
 
+(100M) -> np 
+real	0m2.072s
+user	0m1.771s
+sys	0m0.351s
+
+(* pas np*)
+real	0m11.460s
+user	0m11.364s
+sys	0m0.016s
 
 
 ## Autres trucs
