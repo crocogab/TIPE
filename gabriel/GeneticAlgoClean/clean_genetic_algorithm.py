@@ -5,9 +5,9 @@ from mutation import *
 from scaling import *
 from sharing import *
 from math import floor
-import concurrent.futures
 import uuid
 import matplotlib.pyplot as plt
+from threading import Thread
 
 ############ Paramètres #############
 
@@ -115,16 +115,38 @@ def generation(list_individus,gen_nb,cluster_list):
     list_individus_n=liste_finale
     print(f'Generation : {actual_gen} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
 
-def generate():
-  
-  list_individus=[]
-  for _ in range(NB_INDIVIDUS):
+def initialise_one_cpu(list_individus):
+  for _ in range(NB_INDIVIDUS//4):
       i1=Individu()
       i1.random_init()
       i1.name=uuid.uuid4()
       i1.evaluate()
       list_individus.append(i1)
+      print("[DEBUG] individu initialise")
+
+
+def generate():
   
+  list_individus=[]
+  t1 = Thread(target=initialise_one_cpu, args=[list_individus])
+  t2 = Thread(target=initialise_one_cpu, args=[list_individus])
+  t3 = Thread(target=initialise_one_cpu, args=[list_individus])
+  t4 = Thread(target=initialise_one_cpu, args=[list_individus])
+
+
+  t1.run()
+  t2.run()
+  t3.run()
+  t4.run()
+
+
+  t1.join()
+  t2.join()
+  t3.join()
+  t4.join()
+
+  print(len(list_individus))
+
   clusters=init_clusters(list_individus)
   print("[DEBUG] Clusters ont ete init")
   fusion_clusters(clusters)
@@ -133,6 +155,6 @@ def generate():
   generation(list_individus,NB_ITERATIONS,clusters)
         
 if __name__=='__main__':
-  with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-    executor.submit(generate,)
+  generate()
+  
    
