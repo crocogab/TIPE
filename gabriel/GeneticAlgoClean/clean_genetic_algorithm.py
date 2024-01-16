@@ -7,7 +7,7 @@ from sharing import *
 from math import floor
 import uuid
 import matplotlib.pyplot as plt
-from threading import Thread
+import threading
 
 ############ Paramètres #############
 
@@ -122,29 +122,28 @@ def initialise_one_cpu(list_individus):
       i1.name=uuid.uuid4()
       i1.evaluate()
       list_individus.append(i1)
-      print("[DEBUG] individu initialise")
+      print(f"[DEBUG] individu initialise {threading.get_ident()}")
 
 
 def generate():
   
   list_individus=[]
-  t1 = Thread(target=initialise_one_cpu, args=[list_individus])
-  t2 = Thread(target=initialise_one_cpu, args=[list_individus])
-  t3 = Thread(target=initialise_one_cpu, args=[list_individus])
-  t4 = Thread(target=initialise_one_cpu, args=[list_individus])
+  t1 = threading.Thread(target=initialise_one_cpu, args=[list_individus])
+  t2 = threading.Thread(target=initialise_one_cpu, args=[list_individus])
+  t3 = threading.Thread(target=initialise_one_cpu, args=[list_individus])
+  t4 = threading.Thread(target=initialise_one_cpu, args=[list_individus])
 
 
-  t1.run()
-  t2.run()
-  t3.run()
-  t4.run()
-
+  t1.start()
+  t2.start()
+  t3.start()
+  t4.start()
 
   t1.join()
   t2.join()
   t3.join()
   t4.join()
-
+  
   print(len(list_individus))
 
   clusters=init_clusters(list_individus)
