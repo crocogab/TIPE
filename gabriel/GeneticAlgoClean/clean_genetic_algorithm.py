@@ -41,28 +41,46 @@ def generation(list_individus,gen_nb,cluster_list):
       list_conserv.append(list_individus_n[0])
       list_individus_n.pop(0) 
     
-    for i in range(NB_INDIVIDUS//4):
-      """ un quart est muté"""
-      i1=mutation(list_individus_n[0])
-      i1.name=uuid.uuid4() #ordre des instructions est important ici pour ne pas retirer mauvais elements
-      remove_individu(list_individus_n[0],clusters)
-      add_individu(i1,clusters)
-      list_conserv.append(i1)
-      list_individus_n.pop(0)
-    for i in range(NB_INDIVIDUS//8):
-      """ un quart est croisé"""
-      i1,i2=croisement(list_individus_n[0],list_individus_n[NB_INDIVIDUS-len(list_conserv)-1])
-      i1.name=uuid.uuid4()
-      i2.name=uuid.uuid4()
-      remove_individu(list_individus_n[0],clusters)
-      add_individu(i1,clusters)
-      remove_individu((list_individus_n[NB_INDIVIDUS-len(list_conserv)-1]),clusters)
-      add_individu(i2,clusters)
-      list_conserv.append(i1)
-      list_conserv.append(i2)
-      list_individus_n.pop(0)
-      list_individus_n.pop(NB_INDIVIDUS-len(list_conserv)-1)
+    def mutation():
+      for i in range(NB_INDIVIDUS//8):
+        """ un quart est muté"""
+        i1=mutation(list_individus_n[0])
+        i1.name=uuid.uuid4() #ordre des instructions est important ici pour ne pas retirer mauvais elements
+        remove_individu(list_individus_n[0],clusters)
+        add_individu(i1,clusters)
+        list_conserv.append(i1)
+        list_individus_n.pop(0)
     
+    t1 = threading.Thread(target=mutation, args=[])
+    t2 = threading.Thread(target=mutation, args=[])
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+
+
+    def croisement():
+      for i in range(NB_INDIVIDUS//16):
+        """ un quart est croisé"""
+        i1,i2=croisement(list_individus_n[0],list_individus_n[NB_INDIVIDUS-len(list_conserv)-1])
+        i1.name=uuid.uuid4()
+        i2.name=uuid.uuid4()
+        remove_individu(list_individus_n[0],clusters)
+        add_individu(i1,clusters)
+        remove_individu((list_individus_n[NB_INDIVIDUS-len(list_conserv)-1]),clusters)
+        add_individu(i2,clusters)
+        list_conserv.append(i1)
+        list_conserv.append(i2)
+        list_individus_n.pop(0)
+        list_individus_n.pop(NB_INDIVIDUS-len(list_conserv)-1)
+    
+    t1 = threading.Thread(target=croisement, args=[])
+    t2 = threading.Thread(target=croisement, args=[])
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+
     ### Stochastic remainder without replacement selection + sharing
     liste_finale=[]
     score=0
