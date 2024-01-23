@@ -2,7 +2,7 @@ import random
 import json
 import fastrand
 import time
-from multiprocessing.pool import ThreadPool
+
 
 
 with open(r'config.json') as config_file:
