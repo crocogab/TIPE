@@ -64,9 +64,9 @@ def generation(list_individus,gen_nb,cluster_list):
     t1.join()
     t2.join()
 
-
+    print('[DEBUG] TAILLE : ',len(list_conserv))
     def croisement_multi():
-      for i in range(NB_INDIVIDUS//8):
+      for i in range(NB_INDIVIDUS//16):
         """ un quart est croisé"""
         
         with lock:
