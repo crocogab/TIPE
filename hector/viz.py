@@ -1,8 +1,9 @@
-elts =[1,2,3,4,5,6,7,8,9,10]
 from valuetweak import automate,tree_dict
-SAFENESS = 0.412
-from tkinter import *
+from tkinter import Tk, Label
 import math
+
+elts =[1,2,3,4,5,6,7,8,9,10]
+SAFENESS = 0.412
 
 def glouton(elts, target):
     # algorithme glouton (comme le rendu de monnaie)
@@ -15,7 +16,6 @@ def glouton(elts, target):
             target -= elts[ind]
             res += str(elts[ind]) + ","
     return res
-
         
 def remove_last_comma(string):
     return string[:-1]
@@ -42,7 +42,7 @@ def get_all_choices(elts):
     trees = tree_dict()
     res = {}
     for i in range(1,11):
-        SAFENESS = 0.5 - 0.05*i
+        SAFENESS = 0.5
         for elt in elts:
             res[i,str_sum(elt)] = automate(elt, SAFENESS, trees[i])[0]
     return res
