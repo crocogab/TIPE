@@ -4,8 +4,10 @@ from individu import Individu
 def mutation(i1: Individu):
     """Mutation d'un individu -> 1 bit aléatoire"""
     index1 = random.randint(0, 189)
+    index2 = random.randint(0, 189)
     i1_p = i1
     i1_p.chromosomes[index1] = 1-i1.chromosomes[index1]
+    i1_p.chromosomes[index2] = 1-i1.chromosomes[index2]
     i1_p.evaluate()
     return i1_p    
                                   
