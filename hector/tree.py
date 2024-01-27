@@ -82,7 +82,7 @@ def create_game_tree(current: Tree, depth: int, deck: list):
         try:
             deck.remove(child.val)
         except ValueError:
-            logging.warning(
+            logging.error(
                 "card %s already removed (this should never happen wtf)", child.val
             )
         create_game_tree(child, depth + 1, deck)
@@ -96,7 +96,7 @@ def make_my_deck()->list[int]:
     """
     cards = []
     for i in range(13):
-        for _ in range(4):
+        for _ in range(5):
             if i >= 10:
                 cards.append(10)
             else:

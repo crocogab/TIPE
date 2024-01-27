@@ -102,6 +102,7 @@ class Deck:
                 lcard.append(self.l_cards.pop(rd.randint(0, self.nb_cards - 1)))
                 self.nb_cards -= 1
         self.l_cards = lcard
+        self.nb_cards = len(lcard)
 
     def draw(self) -> Card:
         """
@@ -111,6 +112,17 @@ class Deck:
         self.l_cards.pop(0)
         self.nb_cards -= 1
         return card
+    
+    def remove(self, card: Card):
+        """
+        Retire une carte du deck
+        """
+        for i in range(self.nb_cards):
+            if self.l_cards[i].value == card.value and self.l_cards[i].suit == card.suit:
+                self.l_cards.pop(i)
+                self.nb_cards -= 1
+                return 0
+        return -1
 
 
 class Croupier:
