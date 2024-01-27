@@ -9,7 +9,15 @@ import sys
 
 class Tree:
     """
+    Tree class
     A tree is a node with a value and a list of children
+    attributes:
+        val: the value of the node
+        children: the list of children
+        total: the total value of the node and all its parents
+        virtualchildrenscount: the number of children with a value > 21 (for the survival rate)
+        survival: the survival rate of the node
+        root: the root of the tree
     """
 
     def __init__(self, value: int, total: int, children=None, root=None):
@@ -20,11 +28,9 @@ class Tree:
         self.survival = -1
         self.root = root or self
         self.weight = 1
-        # virtual childrens are childrens that represents losing hands
-        # ( needed to calculate the survival rate but  faster to count instead of creating)
 
     def survival_meth(self):
-        """calculates the survival rate of the tree"""
+        """calculates the survival rate of the while tree recursively"""
         try:
             total_weight = sum(
                 child.weight for child in self.children if child.total <= 21
@@ -36,7 +42,12 @@ class Tree:
             child.survival_meth()
 
     def navigate(self, next_node: int):
-        """returns the child with the value next_node if it exists, else returns -1"""
+        """navigate to the next node
+            input:
+                next_node: the value of the next node
+            output:
+                the next node if it exists, -1 otherwise
+        """
         try:
             for child in self.children:
                 if child.val == int(next_node):
@@ -46,13 +57,12 @@ class Tree:
                 f"Invalid child value {next_node}, childs are %s",
                 [child.val for child in self.children],
             )
-            # quit the program if the child does not exist
+            # quit the program if the child does not exist (this should theoretically never happen)
             sys.exit(-1)
-        # if caller is not the create_game_tree function, return -1
         return -1
 
     def shouldtake(self, safeness: float):
-        """returns True if the node is safe enough to be considered a good node"""
+        """returns True if the node is a good node (survival rate > safeness)"""
         if self.children == []:
             return False
         return self.survival > safeness
@@ -61,9 +71,12 @@ class Tree:
 def create_game_tree(current: Tree, depth: int, deck: list):
     """
     create_game_tree creates recursively a tree with each node being a card.
-    current: the current node
-    depth: the number of iterations we've been through
-    deck: list of ints representing cards.
+    inputs:
+        current: the current node
+        depth: the depth of the current node
+        deck: the deck of cards
+    output:
+        the root of the tree
     """
     maxdepth = 8
     if depth == maxdepth:
@@ -84,7 +97,7 @@ def create_game_tree(current: Tree, depth: int, deck: list):
             deck.remove(child.val)
         except ValueError:
             logging.error(
-                "card %s already removed (this should never happen wtf)", child.val
+                "card %s already removed (this should never happen)", child.val
             )
         create_game_tree(child, depth + 1, deck)
         deck.append(child.val)
@@ -92,9 +105,7 @@ def create_game_tree(current: Tree, depth: int, deck: list):
 
 
 def make_my_deck() -> list[int]:
-    """
-    returns a list of cards (int)
-    """
+    """returns a list of 52 cards"""
     cards = []
     for i in range(13):
         for _ in range(5):
@@ -106,7 +117,11 @@ def make_my_deck() -> list[int]:
 
 
 def main():
-    """main function"""
+    """
+    main function
+    asks for the croupier's card and then asks for the player's cards, used for interactive mode
+    (deprecated)
+    """
     carte_croupier = input("Entrer la carte du croupier : ")
     while not carte_croupier.isdigit() or int(carte_croupier) not in range(1, 11):
         carte_croupier = input("Entrée incorrecte : ")
@@ -120,7 +135,7 @@ def main():
         next_card = input("Entrer la carte recue : ")
         while not next_card.isdigit() or int(next_card) not in range(1, 11):
             next_card = input("Entrée incorrecte : ")
-        mytree = mytree.navigate(int(next_card))  # not sure how it worked before
+        mytree = mytree.navigate(int(next_card))
         print(
             [child.val for child in mytree.children],
             mytree.virtualchildrenscount,
@@ -134,19 +149,6 @@ def main():
             print(mytree.total)
             print("Je ne prends pas")
             print(mytree.survival)
-
-
-def automate(card_string: str, safeness: float) -> tuple:
-    """
-    take a list of cards as argument and return true if the player should take a card
-    """
-    card_string = card_string.split(",")
-    logging.debug("card_tab: %s", card_string)
-    mytree = create_game_tree(Tree(0, 0), 0, make_my_deck())
-    mytree.survival_meth()
-    for card in card_string:
-        mytree = mytree.navigate(card)
-    return mytree.shouldtake(safeness), mytree.survival
 
 
 if __name__ == "__main__":

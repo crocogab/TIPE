@@ -1,5 +1,5 @@
-# Find the best SAFENESS value to use in hector/tree.py to get the best winrate.
-# TODO Nouvelle idée calculer une safeness par premier coup du croupier
+# TODO fix tqdm multiple bars and too much tree creation
+# TODO refactor the code
 import logging
 import time
 import multiprocessing
@@ -163,10 +163,7 @@ def safeness_iterate(
 
 
 def safeness_iterate2():
-    """
-    repeat safeness_iterate for each first card of the croupier
-    """
-    # find the best safeness value for each first card of the croupier
+    """repeat safeness_iterate for each first card of the croupier"""
     timestamp = time.time()
     mytree = tree_dict()
     print("tree creation time:", time.time() - timestamp)
@@ -180,7 +177,7 @@ def safeness_iterate2():
             croup_fst=croup_fst,
             trees=mytree,
         )
-        print("Done with", i, "of", croup_fst)
+        print("Safeness iteration done with", i, "of", 10)
 
 
 def contest(iterations: int):
@@ -188,10 +185,6 @@ def contest(iterations: int):
     inputs:
         iterations: int, the number of games to play
     """
-    # create a deeck and a tree
-    # mydeck = tree.make_my_deck()
-    # mytree = tree.create_game_tree(tree.Tree(0, 0), 0, mydeck)
-    # mytree.survival_meth()
     timestamp = time.time()
     trees = tree_dict()
     lost = 0
