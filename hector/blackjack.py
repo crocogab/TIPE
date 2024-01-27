@@ -2,6 +2,7 @@ import random as rd
 
 suits = ["club", "diamond", "heart", "spade"]
 
+
 class Card:  # pylint: disable=too-few-public-methods
     """
     Card class
@@ -112,13 +113,16 @@ class Deck:
         self.l_cards.pop(0)
         self.nb_cards -= 1
         return card
-    
+
     def remove(self, card: Card):
         """
         Retire une carte du deck
         """
         for i in range(self.nb_cards):
-            if self.l_cards[i].value == card.value and self.l_cards[i].suit == card.suit:
+            if (
+                self.l_cards[i].value == card.value
+                and self.l_cards[i].suit == card.suit
+            ):
                 self.l_cards.pop(i)
                 self.nb_cards -= 1
                 return 0
@@ -163,7 +167,7 @@ class Croupier:
         self.check(current_game)
 
 
-class Player: #pylint: disable=too-few-public-methods
+class Player:  # pylint: disable=too-few-public-methods
     """
     Classe du joueur
     choix: true = prend une carte, false = rester
@@ -187,6 +191,7 @@ class Player: #pylint: disable=too-few-public-methods
             self.is_out = True
         elif self.hand.get_value() == 21:
             self.stopped = True
+
 
 class Game:
     """

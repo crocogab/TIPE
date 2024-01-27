@@ -72,7 +72,7 @@ def simple(safeness: float, mytree: tree.Tree) -> bool:
             croupier.hand.get_value(),
         )
     elif player.hand.get_value() == croupier.hand.get_value():
-    # if the player and the croupier have the same value, we replay
+        # if the player and the croupier have the same value, we replay
         lost = simple(safeness, mytree)
     else:
         logging.debug(
@@ -119,7 +119,7 @@ def print_surivals(mytree: tree.Tree):
 
 
 def safeness_iterate(
-    iterations: int = 10000, step: float = 0.0625, safeness: float = 0, stop = 1
+    iterations: int = 10000, step: float = 0.0625, safeness: float = 0, stop=1
 ):
     """
     repeat simple with different safeness values to find the best one. Write the results in data.csv
@@ -165,7 +165,7 @@ def contest(iterations: int):
     # navigate back to the root to avoid creating a new tree
     mytree = mytree.root
     print("iteration time:", time.time() - timestamp2)
-    print("time per iteration:", (time.time() - timestamp2)/iterations)
+    print("time per iteration:", (time.time() - timestamp2) / iterations)
     print("total time:", time.time() - timestamp)
     print(f"Winrate: {((iterations - lost)/iterations)*100}")
     with open("winrate", "a", encoding="utf-8") as file:

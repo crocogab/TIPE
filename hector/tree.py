@@ -6,6 +6,7 @@ import sys
 # the rate is calculated by dividing the number of children
 #  with a value < 21 by the total number of children
 
+
 class Tree:
     """
     A tree is a node with a value and a list of children
@@ -90,7 +91,7 @@ def create_game_tree(current: Tree, depth: int, deck: list):
     return current
 
 
-def make_my_deck()->list[int]:
+def make_my_deck() -> list[int]:
     """
     returns a list of cards (int)
     """
@@ -146,6 +147,7 @@ def automate(card_string: str, safeness: float) -> tuple:
     for card in card_string:
         mytree = mytree.navigate(card)
     return mytree.shouldtake(safeness), mytree.survival
+
 
 if __name__ == "__main__":
     main()

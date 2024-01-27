@@ -1,17 +1,17 @@
 # Find the best SAFENESS value to use in hector/tree.py to get the best winrate.
-#TODO Nouvelle idée calculer une safeness par premier coup du croupier
+# TODO Nouvelle idée calculer une safeness par premier coup du croupier
 import logging
 import time
 import multiprocessing
+import random
 import tqdm
 import tree
-import random
-from blackjack import Player, Croupier, Game, Hand, Card,make_deck
+from blackjack import Player, Croupier, Game, Hand, Card, make_deck
 
 logging.basicConfig(level=logging.INFO)
 
 
-def simple(safeness: float, trees:dict, croup_fst:Card) -> bool:
+def simple(safeness: float, trees: dict, croup_fst: Card) -> bool:
     """
     simple plays a game of blackjack following survival >= safeness
     inputs:
@@ -68,10 +68,12 @@ def simple(safeness: float, trees:dict, croup_fst:Card) -> bool:
                 logging.debug([child.val for child in mytree.children])
         if not croupier.is_out and not croupier.stopped:
             croupier.play(my_game)
-        mytree = mytree.root # reset the tree to the root
+        mytree = mytree.root  # reset the tree to the root
     logging.debug("\033[31m" + "--------------------")
     lost = False
-    trees[croup_fst_v] = mytree.root  # Not sure if this is needed but if it works, don't touch it
+    trees[
+        croup_fst_v
+    ] = mytree.root  # Not sure if this is needed but if it works, don't touch it
     if player.is_out or (
         player.hand.get_value() < croupier.hand.get_value() and not croupier.is_out
     ):
@@ -84,7 +86,7 @@ def simple(safeness: float, trees:dict, croup_fst:Card) -> bool:
             croupier.hand.get_value(),
         )
     elif player.hand.get_value() == croupier.hand.get_value():
-    # if the player and the croupier have the same value, we replay
+        # if the player and the croupier have the same value, we replay
         lost = simple(safeness, trees, croup_fst)
     else:
         logging.debug(
@@ -112,8 +114,8 @@ def automate(card_string: str, safeness: float, my_tree: tree.Tree) -> tuple:
     # navigate the tree to the last card
     for card in card_list:
         my_tree = my_tree.navigate(card)
-        if type(my_tree) == int:
-            raise Exception("my_tree is an int")
+        if isinstance(my_tree, int):
+            raise ValueError("my_tree is an int outside of the tree building function")
     # return the decision
     return my_tree.shouldtake(safeness), my_tree.survival
 
@@ -133,8 +135,13 @@ def print_surivals(mytree: tree.Tree):
 
 
 def safeness_iterate(
-    iterations: int = 10000, step: float = 0.0625, safeness: float = 0, stop = 1, croup_fst:Card = Card(1,"club"),trees:dict=None
-):
+    iterations: int = 10000,
+    step: float = 0.0625,
+    safeness: float = 0,
+    stop=1,
+    croup_fst: Card = Card(1, "club"),
+    trees: dict = None,
+):  # pylint: disable=too-many-arguments
     """
     repeat simple with different safeness values to find the best one. Write the results in data.csv
     inputs:
@@ -154,15 +161,27 @@ def safeness_iterate(
             # navigate back to the root to avoid creating a new tree
         safeness += step
 
+
 def safeness_iterate2():
+    """
+    repeat safeness_iterate for each first card of the croupier
+    """
     # find the best safeness value for each first card of the croupier
     timestamp = time.time()
     mytree = tree_dict()
     print("tree creation time:", time.time() - timestamp)
-    for i in range(1,11):
-        croup_fst = Card(i,"club")
-        safeness_iterate(iterations=100000, step=0.0625, safeness=0, stop=1, croup_fst=croup_fst, trees=mytree)
+    for i in range(1, 11):
+        croup_fst = Card(i, "club")
+        safeness_iterate(
+            iterations=100000,
+            step=0.0625,
+            safeness=0,
+            stop=1,
+            croup_fst=croup_fst,
+            trees=mytree,
+        )
         print("Done with", i, "of", croup_fst)
+
 
 def contest(iterations: int):
     """plays number games and print the winrate
@@ -180,23 +199,38 @@ def contest(iterations: int):
     # tqdm is used for the progress bar it's like a for loop but with a progress bar
     timestamp2 = time.time()
     for _ in tqdm.tqdm(range(iterations)):
-        i = random.randint(1,10)
-        croup_fst = Card(i,"club")
-        st = [0.3125, 0.6875, 0.75, 0.9375, 0.75, 0.6875, 0.375, 0.375, 0.375, 0.4375]
-        safeness = st[i-1]
-        if simple(safeness, trees,croup_fst=croup_fst):
+        i = random.randint(1, 10)
+        croup_fst = Card(i, "club")
+        safeness_table = [
+            0.3125,
+            0.6875,
+            0.75,
+            0.9375,
+            0.75,
+            0.6875,
+            0.375,
+            0.375,
+            0.375,
+            0.4375,
+        ]
+        safeness = safeness_table[i - 1]
+        if simple(safeness, trees, croup_fst=croup_fst):
             lost += 1
     print("iteration time:", time.time() - timestamp2)
-    print("time per iteration:", (time.time() - timestamp2)/iterations)
+    print("time per iteration:", (time.time() - timestamp2) / iterations)
     print("total time:", time.time() - timestamp)
     print(f"Winrate: {((iterations - lost)/iterations)*100}")
     with open("winrate", "a", encoding="utf-8") as file:
         file.write(f"Winrate: {(1 - lost/iterations)*100}\n")
-    return (1 - lost/iterations)*100
+    return (1 - lost / iterations) * 100
+
 
 def tree_dict():
+    """
+    create a dictionary of trees for each first card of the croupier
+    """
     trees = {}
-    for i in range(1,11):
+    for i in range(1, 11):
         mydeck = tree.make_my_deck()
         mydeck.remove(i)
         trees[i] = tree.create_game_tree(tree.Tree(0, 0), 0, mydeck)
@@ -204,11 +238,12 @@ def tree_dict():
         print("Done with", i, "of", 10)
     return trees
 
+
 if __name__ == "__main__":
     # compute a total winrate from multiple contests run in parallel with multiprocessing
-    #safeness_iterate2()
+    # safeness_iterate2()
     ITERATION_PER_THREADS = 1000000
     threads = multiprocessing.cpu_count()
     with multiprocessing.Pool(threads) as p:
-        WINRATE = sum(p.map(contest, [ITERATION_PER_THREADS]*threads))/threads
+        WINRATE = sum(p.map(contest, [ITERATION_PER_THREADS] * threads)) / threads
     print(f"Total winrate: {WINRATE}")
