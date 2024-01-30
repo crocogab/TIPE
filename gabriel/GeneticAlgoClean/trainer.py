@@ -2,14 +2,19 @@ from clean_genetic_algorithm import generation
 from individu import Individu
 from sharing import init_clusters,fusion_clusters
 import json
-import concurrent.futures
+import threading
 
 with open(r'training.json') as training_file:
     data = json.load(training_file)
 
+with open(r'config.json') as config_file:
+    data2 = json.load(config_file)
+
 
 list_chromosomes = []
 liste_finale=[]
+
+print(data2['nb_iterations']-data['nb_generation'])
 
 for chromosome in data['chromosomes']:
     chromo_actu=[]
@@ -24,10 +29,11 @@ for elem in list_chromosomes:
     i1.evaluate()
     liste_finale.append(i1)
 
+
+lock = threading.Lock()
 clusters=init_clusters(liste_finale)
 fusion_clusters(clusters)
 print('Cluster fusionnes :)\n')
-with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
-    executor.submit(generation,liste_finale, data['nb_generation'],clusters,)
+generation(liste_finale, data2['nb_iterations']-data['nb_generation'],clusters)
 
 
