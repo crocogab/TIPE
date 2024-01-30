@@ -42,35 +42,37 @@ def generation(list_individus,gen_nb,cluster_list):
       list_individus_n.pop(0) 
     
     def mutation_multi():
-      for i in range(NB_INDIVIDUS//8):
+      for i in range(NB_INDIVIDUS//16):
         """ un quart est muté"""
         
         with lock:
-          print(f"[DEBUG] {threading.get_ident()} a lock")
-       
           i1=mutation(list_individus_n[0])
           i1.name=uuid.uuid4() #ordre des instructions est important ici pour ne pas retirer mauvais elements
           remove_individu(list_individus_n[0],clusters)
           add_individu(i1,clusters)
           list_conserv.append(i1)
-          list_individus_n.pop(0)
-          print(f"[DEBUG] {threading.get_ident()} a unlock")
+          list_individus_n.pop(0)       
+        i1.evaluate() #evaluation n'est plus dans la mutation
         
-    
     t1 = threading.Thread(target=mutation_multi, args=[])
     t2 = threading.Thread(target=mutation_multi, args=[])
+    t3 = threading.Thread(target=mutation_multi, args=[])
+    t4 = threading.Thread(target=mutation_multi, args=[])
     t1.start()
     t2.start()
+    t3.start()
+    t4.start()
     t1.join()
     t2.join()
+    t3.join()
+    t4.join()
 
-    print('[DEBUG] TAILLE : ',len(list_conserv))
+    #print('[DEBUG] TAILLE : ',len(list_conserv))
     def croisement_multi():
       for i in range(NB_INDIVIDUS//16):
         """ un quart est croisé"""
         
         with lock:
-          print(f"[DEBUG] {threading.get_ident()} a lock2")
           i1,i2=croisement(list_individus_n[0],list_individus_n[NB_INDIVIDUS-len(list_conserv)-1])
           i1.name=uuid.uuid4()
           i2.name=uuid.uuid4()
@@ -82,7 +84,8 @@ def generation(list_individus,gen_nb,cluster_list):
           list_conserv.append(i2)
           list_individus_n.pop(0)
           list_individus_n.pop(NB_INDIVIDUS-len(list_conserv)-1)
-          print(f"[DEBUG] {threading.get_ident()} a unlock2")
+        i1.evaluate()
+        i2.evaluate()
         
         
     
@@ -152,7 +155,6 @@ def initialise_one_cpu(list_individus):
       i1.name=uuid.uuid4()
       i1.evaluate()
       list_individus.append(i1)
-      print(f"[DEBUG] individu initialise {threading.get_ident()}")
 
 
 def generate():
