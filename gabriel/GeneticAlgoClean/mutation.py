@@ -8,7 +8,6 @@ def mutation(i1: Individu):
     i1_p = i1
     i1_p.chromosomes[index1] = 1-i1.chromosomes[index1]
     i1_p.chromosomes[index2] = 1-i1.chromosomes[index2]
-    i1_p.evaluate()
     return i1_p    
                                   
 
@@ -27,6 +26,5 @@ def croisement(i1: Individu, i2: Individu):
     i3.chromosomes = i1.chromosomes[:index3] + i2.chromosomes[index3:index1] + i1.chromosomes[index1:]
     i4.chromosomes = i1.chromosomes[:index4] + i2.chromosomes[index4:index2] + i1.chromosomes[index2:]
 
-    i3.evaluate()
-    i4.evaluate()
+    
     return i3,i4
