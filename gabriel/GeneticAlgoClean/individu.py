@@ -123,9 +123,9 @@ class Individu():
         if croupier_val>21:
           c_in_game=False
         if croupier_val==21 :
-                return False
+          return False
         if player_val==21:
-                return True
+          return True
       
       if player_val==21:
         winner=True

@@ -11,6 +11,7 @@ import threading
 
 ############ Paramètres #############
 
+lock = threading.Lock() #permet threading dans trainer
 with open(r'config.json') as config_file:
     data = json.load(config_file)
 
@@ -123,7 +124,7 @@ def generation(list_individus,gen_nb,cluster_list):
       a=random.uniform(0,1)
       liste_finale.append(find(association,a*score))
     #############
-    if actual_gen%5==0:
+    if (actual_gen+1)%5==0:
       """On enregistre sur fichier json pour save le training"""
       individu_json={
         'nb_generation':actual_gen,
@@ -186,7 +187,6 @@ def generate():
   generation(list_individus,NB_ITERATIONS,clusters)
         
 if __name__=='__main__':
-  lock = threading.Lock()
   generate()
   
    

@@ -1,6 +1,6 @@
 from pickle import NONE
 import sys
-sys.path.insert(1, '/content/TIPE/gabriel/GeneticAlgoClean')
+sys.path.insert(1, 'GeneticAlgoClean')
 from individu import *
 import json
 import threading

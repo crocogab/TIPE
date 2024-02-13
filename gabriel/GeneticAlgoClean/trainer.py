@@ -30,7 +30,7 @@ for elem in list_chromosomes:
     liste_finale.append(i1)
 
 
-lock = threading.Lock()
+
 clusters=init_clusters(liste_finale)
 fusion_clusters(clusters)
 print('Cluster fusionnes :)\n')
