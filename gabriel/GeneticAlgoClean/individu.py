@@ -67,12 +67,12 @@ class Individu():
         tab.sort(reverse=True)
         for card in tab:
             if card==1:
-                if total+10>21 and not has_use:
+                if total+11>21 and not has_use:
                     total+=1
                     has_use=True
                     
                 else:
-                    total+=10
+                    total+=11
             
             else:    
                 total+=card             
