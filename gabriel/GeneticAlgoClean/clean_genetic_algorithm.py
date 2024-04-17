@@ -155,6 +155,7 @@ def initialise_one_cpu(list_individus):
       i1.random_init()
       i1.name=uuid.uuid4()
       i1.evaluate()
+      # on peut avoir un pb de nb quand on initialise les individus - doit stocker liste temporaire et ajouter
       list_individus.append(i1)
 
 
