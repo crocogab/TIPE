@@ -1,6 +1,5 @@
 import random
 import json
-import sys
 from mutation import *
 from scaling import *
 from sharing import *
@@ -43,7 +42,7 @@ def generation(list_individus,gen_nb,cluster_list):
       list_individus_n.pop(0) 
     
     def mutation_multi():
-      for i in range(NB_INDIVIDUS//16):
+      for _ in range(NB_INDIVIDUS//16):
         """ un quart est muté"""
         
         with lock:
@@ -150,13 +149,18 @@ def generation(list_individus,gen_nb,cluster_list):
     print(f'Generation : {actual_gen} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
 
 def initialise_one_cpu(list_individus):
+  list_temp=[]
   for _ in range(NB_INDIVIDUS//4):
       i1=Individu()
       i1.random_init()
       i1.name=uuid.uuid4()
       i1.evaluate()
       # on peut avoir un pb de nb quand on initialise les individus - doit stocker liste temporaire et ajouter
-      list_individus.append(i1)
+      list_temp.append(i1)
+  print(f"Processus {threading.current_thread().ident} va ajouter les individus a la liste")
+  with lock:
+    list_individus.extend(list_temp)
+  del list_temp
 
 
 def generate():
