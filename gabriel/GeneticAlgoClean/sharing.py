@@ -1,4 +1,3 @@
-from re import I
 from individu import Individu
 from math import sqrt
 
@@ -11,6 +10,7 @@ alpha=0.8
 class cluster:
     def __init__(self) -> None:
         self.individus = []
+        self.best_individu
         self.individus_name=[]
         self.centre = []
 
@@ -32,6 +32,7 @@ def init_clusters(individus: list):
       clusters[-1].individus.append(i)
       clusters[-1].individus_name.append(i.name)
       clusters[-1].centre = i.chromosomes
+      clusters[-1].best_individu=i
   print("[DEBUG] initialisation terminee")
   return clusters    
 
@@ -48,6 +49,8 @@ def fusion_clusters(clusters: list):
           c1.centre=[(c1.centre[l]+c2.centre[l])/2 for l in range(190)]
           c1.individus.extend(c2.individus)
           c1.individus_name.extend(c2.individus_name)
+          if c1.best_individu.fitness<c2.best_individu.fitness:
+            c1.best_individu=c2.best_individu
 
  
   
@@ -69,11 +72,15 @@ def add_individu(i1:Individu,clusters:list):
     clusters[indice].centre=[(clusters[indice].centre[l]+i1.chromosomes[l])/a for l in range(190)]
     clusters[indice].individus.append(i1)
     clusters[indice].individus_name.append(i1.name)
+    if clusters[indice].best_individu.fitness<i1.fitness:
+      clusters[indice].best_individu=i1
+  
   else:
     c=cluster()
     c.individus=[i1]
     c.individus_name=[i1.name]
     c.centre=i1.chromosomes
+    c.best_individu=i1
     clusters.append(c)
 
 
@@ -81,11 +88,18 @@ def add_individu(i1:Individu,clusters:list):
 def remove_individu(i1:Individu,clusters:list):
   for i in range(len(clusters)): # a checker si marche bien
     if i1.name in clusters[i].individus_name:
-      j=clusters[i].individus_name.index(i1.name)
-      clusters[i].individus_name.remove(i1.name)
-      clusters[i].individus.pop(j)
+      if len(clusters[i].individus)!=1:
+        j=clusters[i].individus_name.index(i1.name)
+        clusters[i].individus_name.remove(i1.name)
+        clusters[i].individus.pop(j)
+        a=len(clusters[i].individus)
+        clusters[i].centre=[(clusters[i].centre[l]-i1.chromosomes[l])/a for l in range(190)]
+
+      else:
+        #on supprime clusters de taille 1
+        clusters.pop(i)
     
-    return None
+  return None
           
 
 
