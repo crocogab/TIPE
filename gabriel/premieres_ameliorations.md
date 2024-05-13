@@ -465,3 +465,10 @@ print(f"[debug] : croupier_score : %s" % self.calculate_val(croupier_list))
 print(f"[WINNER] %s" % winner)
 
 ```
+
+On va procéder fonction par fonction :
+* Fusion -> OK
+* init cluster
+* add individu
+* remove individu
+* individu cluster

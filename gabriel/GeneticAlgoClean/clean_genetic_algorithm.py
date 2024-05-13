@@ -3,6 +3,7 @@ import json
 from mutation import *
 from scaling import *
 from sharing import *
+from calcul_d import *
 from math import floor
 import uuid
 import matplotlib.pyplot as plt
@@ -36,9 +37,18 @@ def generation(list_individus,gen_nb,cluster_list):
     #plus forcement le meme evaluate qu'avant (random) donc le meme sens
     list_conserv=[]
         
-    for _ in range(NB_INDIVIDUS//2):
-      """ moitié est conservée"""
+    for _ in range(NB_INDIVIDUS//4):
+      """ quart est conservée"""
       list_conserv.append(list_individus_n[0])
+      list_individus_n.pop(0)
+    
+    for _ in range(NB_INDIVIDUS//4): #ne sert a rien de multithread car on a une section critique dans le code
+      """ quart est nouveau"""
+      i1=Individu()
+      i1.random_init()
+      i1.name=uuid.uuid4()
+      i1.evaluate()
+      list_conserv.append(i1)
       list_individus_n.pop(0) 
     
     def mutation_multi():
@@ -49,10 +59,10 @@ def generation(list_individus,gen_nb,cluster_list):
           i1=mutation(list_individus_n[0])
           i1.name=uuid.uuid4() #ordre des instructions est important ici pour ne pas retirer mauvais elements
           remove_individu(list_individus_n[0],clusters)
-          add_individu(i1,clusters)
+          add_individu(i1,clusters,gen_nb==0)
           list_conserv.append(i1)
           list_individus_n.pop(0)       
-        i1.evaluate() #evaluation n'est plus dans la mutation
+        i1.evaluate() #evaluation n'est plus dans la section critique
         
     t1 = threading.Thread(target=mutation_multi, args=[])
     t2 = threading.Thread(target=mutation_multi, args=[])
@@ -62,14 +72,11 @@ def generation(list_individus,gen_nb,cluster_list):
     t2.start()
     t3.start()
     t4.start()
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
+    
 
     #print('[DEBUG] TAILLE : ',len(list_conserv))
     def croisement_multi():
-      for i in range(NB_INDIVIDUS//16):
+      for _ in range(NB_INDIVIDUS//16):
         """ un quart est croisé"""
         
         with lock:
@@ -77,9 +84,9 @@ def generation(list_individus,gen_nb,cluster_list):
           i1.name=uuid.uuid4()
           i2.name=uuid.uuid4()
           remove_individu(list_individus_n[0],clusters)
-          add_individu(i1,clusters)
+          add_individu(i1,clusters,gen_nb==0)
           remove_individu((list_individus_n[NB_INDIVIDUS-len(list_conserv)-1]),clusters)
-          add_individu(i2,clusters)
+          add_individu(i2,clusters,gen_nb==0)
           list_conserv.append(i1)
           list_conserv.append(i2)
           list_individus_n.pop(0)
@@ -89,19 +96,24 @@ def generation(list_individus,gen_nb,cluster_list):
         
         
     
-    t1 = threading.Thread(target=croisement_multi, args=[])
-    t2 = threading.Thread(target=croisement_multi, args=[])
-    t1.start()
-    t2.start()
+    t5 = threading.Thread(target=croisement_multi, args=[])
+    t6 = threading.Thread(target=croisement_multi, args=[])
+    t5.start()
+    t6.start()
+    
     t1.join()
     t2.join()
+    t3.join()
+    t4.join()
+    t5.join()
+    t6.join()
 
     ### Stochastic remainder without replacement selection + sharing
     liste_finale=[]
     score=0
     k_exp=exp_scaling(actual_gen+1)
     total=0
-    mi_value=[sharing(i1,clusters) for i1 in list_conserv]
+    mi_value=[sharing(i1,clusters,gen_nb==0) for i1 in list_conserv]
     #print(f"[DEBUG]: tableau cree -> val max = {max(mi_value)}")
     for i in range(len(list_conserv)):
       total+=(((list_conserv[i].fitness)**k_exp)/mi_value[i])
@@ -122,12 +134,25 @@ def generation(list_individus,gen_nb,cluster_list):
     for _ in range(NB_INDIVIDUS-len(liste_finale)):
       a=random.uniform(0,1)
       liste_finale.append(find(association,a*score))
-    #############
+    #############[CALCUL DE DMOY + DELTA]########
+    
+    with open(r'training.json') as training_file:
+      data2 = json.load(training_file)
+
+    delta_old=data2['delta']
+    dmoy=calcul_dmoy(clusters,liste_finale)
+    nopt=calcul_nopt(max(mi_value),clusters)
+    delta=calcul_delta(nopt,len(clusters),delta_old)
+   
+
+    ##################
     if (actual_gen+1)%5==0:
       """On enregistre sur fichier json pour save le training"""
       individu_json={
         'nb_generation':actual_gen,
         'fitness_moyenne':moy_fitness,
+        'delta':delta,
+        'dmoy':dmoy,
         'chromosomes':[''.join(map(str,individu.chromosomes)) for individu in liste_finale]
       }
       with open(r"training.json", "w") as f:
@@ -146,7 +171,7 @@ def generation(list_individus,gen_nb,cluster_list):
     
 
     list_individus_n=liste_finale
-    print(f'Generation : {actual_gen} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp}')
+    print(f'Generation : {actual_gen} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp} | delta:{delta} | dmoy:{dmoy}')
 
 def initialise_one_cpu(list_individus):
   list_temp=[]
@@ -186,8 +211,19 @@ def generate():
 
   clusters=init_clusters(list_individus)
   print("[DEBUG] Clusters ont ete init")
-  fusion_clusters(clusters)
+  fusion_clusters(clusters,True)
   print("[DEBUG] Clusters ont ete fusionnes")
+  print("[DEBUG] Dmoy + Delta initialization")
+  
+  individu_json={
+        'nb_generation':0,
+        'fitness_moyenne':0,
+        'delta':2.0,
+        'dmoy':0,
+        'chromosomes':[]
+      }
+  with open(r"training.json", "w") as f:
+    f.write(json.dumps(individu_json, indent=4))
   
   generation(list_individus,NB_ITERATIONS,clusters)
         

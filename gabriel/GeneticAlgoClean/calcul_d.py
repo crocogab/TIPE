@@ -33,14 +33,6 @@ def calcul_delta(Nopt,Nc,delta):
     if (Nopt/Nc)>S1 and (100 > delta):
         new_delta=delta*1.05
     if S2> (Nopt/Nc) and (delta>1):
-        new_delta=delta*0,95
+        new_delta=delta*0.95
     return new_delta
 
-def calcul_d(dmoy,delta):
-    """
-    Calcule et renvoie (dmin,dmax)
-    dmoy: valeur de dmoy 
-    delta : valeur de delta 
-    """
-    dmax=(dmoy/delta)
-    return(dmax,(dmax/3))
