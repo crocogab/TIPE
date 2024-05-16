@@ -72,6 +72,11 @@ def generation(list_individus,gen_nb,cluster_list):
     t2.start()
     t3.start()
     t4.start()
+
+    t1.join()
+    t2.join()
+    t3.join()
+    t4.join()
     
 
     #print('[DEBUG] TAILLE : ',len(list_conserv))
@@ -101,10 +106,7 @@ def generation(list_individus,gen_nb,cluster_list):
     t5.start()
     t6.start()
     
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
+    
     t5.join()
     t6.join()
 
@@ -146,17 +148,17 @@ def generation(list_individus,gen_nb,cluster_list):
    
 
     ##################
-    if (actual_gen+1)%5==0:
-      """On enregistre sur fichier json pour save le training"""
-      individu_json={
-        'nb_generation':actual_gen,
-        'fitness_moyenne':moy_fitness,
-        'delta':delta,
-        'dmoy':dmoy,
-        'chromosomes':[''.join(map(str,individu.chromosomes)) for individu in liste_finale]
-      }
-      with open(r"training.json", "w") as f:
-        f.write(json.dumps(individu_json, indent=4))
+    
+      
+    individu_json={
+      'nb_generation':actual_gen,
+      'fitness_moyenne':moy_fitness,
+      'delta':delta,
+      'dmoy':dmoy,
+      'chromosomes':[''.join(map(str,individu.chromosomes)) for individu in liste_finale]
+    }
+    with open(r"training.json", "w") as f:
+      f.write(json.dumps(individu_json, indent=4))
     
     X_SCORE.append(moy_fitness)
     Y_GEN.append(actual_gen)
@@ -171,7 +173,8 @@ def generation(list_individus,gen_nb,cluster_list):
     
 
     list_individus_n=liste_finale
-    print(f'Generation : {actual_gen} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp} | delta:{delta} | dmoy:{dmoy}')
+    clean_clusters(clusters, [i.name for i in liste_finale])
+    print(f'Generation : {actual_gen} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp} | delta:{delta} | dmoy:{dmoy} |Nombre clusters : {len(clusters)} | Nombre individus : {len(liste_finale)}')
 
 def initialise_one_cpu(list_individus):
   list_temp=[]
@@ -182,7 +185,7 @@ def initialise_one_cpu(list_individus):
       i1.evaluate()
       # on peut avoir un pb de nb quand on initialise les individus - doit stocker liste temporaire et ajouter
       list_temp.append(i1)
-  print(f"Processus {threading.current_thread().ident} va ajouter les individus a la liste")
+  #print(f"Processus {threading.current_thread().ident} va ajouter les individus a la liste")
   with lock:
     list_individus.extend(list_temp)
   del list_temp
@@ -207,12 +210,13 @@ def generate():
   t3.join()
   t4.join()
   
-  print(len(list_individus))
+  
 
   clusters=init_clusters(list_individus)
   print("[DEBUG] Clusters ont ete init")
   fusion_clusters(clusters,True)
   print("[DEBUG] Clusters ont ete fusionnes")
+  print("[DEBUG] Nombre de clusters : ",len(clusters))
   print("[DEBUG] Dmoy + Delta initialization")
   
   individu_json={

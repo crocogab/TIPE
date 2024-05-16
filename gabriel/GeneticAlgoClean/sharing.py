@@ -105,8 +105,18 @@ def add_individu(i1:Individu,clusters:list,initial):
     c.best_individu=i1
     clusters.append(c)
 
-
-    
+def clean_clusters(clusters,list_individus_name):
+  """nettoie clusters -> enleve les clusters dont les elemnts ne sont plus dans list_individus"""
+  liste_a_pop=[]
+  decr=0
+  for i in range(len(clusters)):
+    if len(clusters[i].individus)==1:
+      if clusters[i].individus[0].name not in list_individus_name:
+        liste_a_pop.append(i)
+  for i in range(len(liste_a_pop)):
+    del clusters[liste_a_pop[i]-decr]
+    decr+=1
+  
 
 def remove_individu(i1:Individu,clusters:list):
   for i in range(len(clusters)): # a checker si marche bien
