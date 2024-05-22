@@ -140,9 +140,18 @@ def remove_individu(i1:Individu,clusters:list):
 
 def individu_clusters(i1: Individu, clusters: list):
     """Nombre d'individus dans le cluster de i1"""
+    #un individu peut etre dans plusieurs clusters -> on renvoie distance min
+
+    distance=distance_individus(i1, clusters[0].centre)
+    retour=len(clusters[0].individus),clusters[0]
     for i in range(len(clusters)):
       if i1.name in clusters[i].individus_name:
-        return (len(clusters[i].individus),clusters[i])
+        if distance_individus(i1.name, clusters[i].centre) < distance:
+          retour = len(clusters[i].individus),clusters[i]
+    
+    return retour
+    
+    
     #for i in range(len(clusters)):
     #   print(clusters[i].individus_name)
     #print( f"Error individu not found {type(clusters[i])} {i1.name}") 
@@ -154,6 +163,6 @@ def sharing(i1:Individu,clusters:list,initial):
   d_max=update_d(initial)[0]
   try:
     nc,c=individu_clusters(i1,clusters)
-    return nc*(1-((distance_liste(i1.chromosomes,c.centre))/(2*d_max))**alpha)
+    return nc*(1-(((distance_liste(i1.chromosomes,c.centre))/(2*d_max))**alpha))
   except: #permet d'eviter crash total si bug -> plus erreur normalement
     return 1

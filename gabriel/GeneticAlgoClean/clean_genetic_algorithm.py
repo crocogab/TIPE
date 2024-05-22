@@ -34,16 +34,16 @@ def generation(list_individus,gen_nb,cluster_list):
   list_individus_n=list_individus
   for actual_gen in range(gen_nb):
     
-    #plus forcement le meme evaluate qu'avant (random) donc le meme sens
+    
     list_conserv=[]
         
-    for _ in range(NB_INDIVIDUS//4):
-      """ quart est conservée"""
-      list_conserv.append(list_individus_n[0])
-      list_individus_n.pop(0)
+    # for _ in range(NB_INDIVIDUS//4):
+    #   """ quart est conservée"""
+    #   list_conserv.append(list_individus_n[0])
+    #   list_individus_n.pop(0)
     
-    for _ in range(NB_INDIVIDUS//4): #ne sert a rien de multithread car on a une section critique dans le code
-      """ quart est nouveau"""
+    for _ in range(NB_INDIVIDUS//2): 
+      """ moitié est nouveau"""
       i1=Individu()
       i1.random_init()
       i1.name=uuid.uuid4()
@@ -51,82 +51,65 @@ def generation(list_individus,gen_nb,cluster_list):
       list_conserv.append(i1)
       list_individus_n.pop(0) 
     
-    def mutation_multi():
-      for _ in range(NB_INDIVIDUS//16):
-        """ un quart est muté"""
-        
-        with lock:
-          i1=mutation(list_individus_n[0])
-          i1.name=uuid.uuid4() #ordre des instructions est important ici pour ne pas retirer mauvais elements
-          remove_individu(list_individus_n[0],clusters)
-          add_individu(i1,clusters,gen_nb==0)
-          list_conserv.append(i1)
-          list_individus_n.pop(0)       
-        i1.evaluate() #evaluation n'est plus dans la section critique
-        
-    t1 = threading.Thread(target=mutation_multi, args=[])
-    t2 = threading.Thread(target=mutation_multi, args=[])
-    t3 = threading.Thread(target=mutation_multi, args=[])
-    t4 = threading.Thread(target=mutation_multi, args=[])
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
+    for _ in range(NB_INDIVIDUS//4):
+      """ un quart est muté"""
+      i1=mutation(list_individus_n[0])
+      i1.name=uuid.uuid4() #ordre des instructions est important ici pour ne pas retirer mauvais elements
+      remove_individu(list_individus_n[0],clusters)
+      add_individu(i1,clusters,gen_nb==0)
+      list_conserv.append(i1)
+      list_individus_n.pop(0)       
+      i1.evaluate()
+    
     
 
-    #print('[DEBUG] TAILLE : ',len(list_conserv))
-    def croisement_multi():
-      for _ in range(NB_INDIVIDUS//16):
-        """ un quart est croisé"""
-        
-        with lock:
-          i1,i2=croisement(list_individus_n[0],list_individus_n[NB_INDIVIDUS-len(list_conserv)-1])
-          i1.name=uuid.uuid4()
-          i2.name=uuid.uuid4()
-          remove_individu(list_individus_n[0],clusters)
-          add_individu(i1,clusters,gen_nb==0)
-          remove_individu((list_individus_n[NB_INDIVIDUS-len(list_conserv)-1]),clusters)
-          add_individu(i2,clusters,gen_nb==0)
-          list_conserv.append(i1)
-          list_conserv.append(i2)
-          list_individus_n.pop(0)
-          list_individus_n.pop(NB_INDIVIDUS-len(list_conserv)-1)
-        i1.evaluate()
-        i2.evaluate()
-        
-        
     
-    t5 = threading.Thread(target=croisement_multi, args=[])
-    t6 = threading.Thread(target=croisement_multi, args=[])
-    t5.start()
-    t6.start()
-    
-    
-    t5.join()
-    t6.join()
+    for i in range(NB_INDIVIDUS//8):
+      """ un quart est croisé"""
+      
+      i1,i2=croisement(list_individus_n[0],list_individus_n[NB_INDIVIDUS-len(list_conserv)-1])
+      i1.name=uuid.uuid4()
+      i2.name=uuid.uuid4()
+      remove_individu(list_individus_n[0],clusters)
+      add_individu(i1,clusters,gen_nb==0)
+      remove_individu((list_individus_n[NB_INDIVIDUS-len(list_conserv)-1]),clusters)
+      add_individu(i2,clusters,gen_nb==0)
+      i1.evaluate()
+      i2.evaluate()
+      list_conserv.append(i1)
+      list_conserv.append(i2)
+      list_individus_n.pop(0)
+      list_individus_n.pop(NB_INDIVIDUS-len(list_conserv)-1)
+      
 
-    ### Stochastic remainder without replacement selection + sharing
+    print('[DEVRAIT ETRE 256 1]', len(list_conserv))
+    ### Stochastic remainder without replacement selection + sharing -> pb
     liste_finale=[]
     score=0
     k_exp=exp_scaling(actual_gen+1)
     total=0
     mi_value=[sharing(i1,clusters,gen_nb==0) for i1 in list_conserv]
     #print(f"[DEBUG]: tableau cree -> val max = {max(mi_value)}")
+    print(len(mi_value))
+    
     for i in range(len(list_conserv)):
       total+=(((list_conserv[i].fitness)**k_exp)/mi_value[i])
+    
     moy_fitness=total/NB_INDIVIDUS
-      
-    for i in range(len(list_conserv)):
+
+
+
+
+    for i in range(len(list_conserv)): #pb ici
       r_i=((((list_conserv[i].fitness)**k_exp))/mi_value[i])/moy_fitness
+      
       a=floor(r_i)
+      
       for _ in range(a):  
         liste_finale.append(list_conserv[i])
-      
+    
+    
+    print('[DEBUG] taille liste finale ',len(liste_finale))
     association=[]
     for i in range(len(list_conserv)):
       debut=score
