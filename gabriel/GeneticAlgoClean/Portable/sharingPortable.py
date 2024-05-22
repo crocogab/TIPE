@@ -1,4 +1,4 @@
-from individu import Individu
+from individuPortable import Individu
 from math import sqrt
 import json
 

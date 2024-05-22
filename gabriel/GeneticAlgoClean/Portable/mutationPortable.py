@@ -1,5 +1,5 @@
 import random
-from individu import Individu 
+from individuPortable import Individu 
 
 def mutation(i1: Individu):
     """Mutation d'un individu -> 1 bit aléatoire"""
