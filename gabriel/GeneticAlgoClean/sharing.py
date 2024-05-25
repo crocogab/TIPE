@@ -40,7 +40,7 @@ def init_clusters(individus: list):
       clusters.append(cluster())
       clusters[-1].individus.append(i)
       clusters[-1].individus_name.append(i.name)
-      clusters[-1].centre = i.chromosomes
+      clusters[-1].centre = i.chromosomes.copy()
       clusters[-1].best_individu=i
   print("[DEBUG] initialisation terminee")
   return clusters    
@@ -101,7 +101,7 @@ def add_individu(i1:Individu,clusters:list,initial):
     c=cluster()
     c.individus=[i1]
     c.individus_name=[i1.name]
-    c.centre=i1.chromosomes
+    c.centre=i1.chromosomes.copy()
     c.best_individu=i1
     clusters.append(c)
 

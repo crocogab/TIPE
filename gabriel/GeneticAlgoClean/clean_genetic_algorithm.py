@@ -4,6 +4,7 @@ from mutation import *
 from scaling import *
 from sharing import *
 from calcul_d import *
+from individu import Individu
 from math import floor
 import uuid
 import matplotlib.pyplot as plt
@@ -27,12 +28,12 @@ def find(liste,val):
 
 #####################################
 
-def generation(list_individus,gen_nb,cluster_list):
+def generation(list_individus,gen_nb,cluster_list,iteration_initial):
   X_SCORE=[]
   Y_GEN=[]
   clusters=cluster_list
   list_individus_n=list_individus
-  for actual_gen in range(gen_nb):
+  for actual_gen in range(gen_nb-1):
     
     
     list_conserv=[]
@@ -46,20 +47,31 @@ def generation(list_individus,gen_nb,cluster_list):
       """ moitié est nouveau"""
       i1=Individu()
       i1.random_init()
+      
       i1.name=uuid.uuid4()
       i1.evaluate()
+      
       list_conserv.append(i1)
-      list_individus_n.pop(0) 
+      add_individu(i1,clusters,gen_nb==0)
+      
+      list_individus_n.pop(0)
+      
     
-    for _ in range(NB_INDIVIDUS//4):
+    
+      
+    
+
+    for _ in range(NB_INDIVIDUS//4): #bug ici
       """ un quart est muté"""
       i1=mutation(list_individus_n[0])
+      
       i1.name=uuid.uuid4() #ordre des instructions est important ici pour ne pas retirer mauvais elements
       remove_individu(list_individus_n[0],clusters)
       add_individu(i1,clusters,gen_nb==0)
       list_conserv.append(i1)
       list_individus_n.pop(0)       
       i1.evaluate()
+    
     
     
 
@@ -82,15 +94,16 @@ def generation(list_individus,gen_nb,cluster_list):
       list_individus_n.pop(NB_INDIVIDUS-len(list_conserv)-1)
       
 
-    print('[DEVRAIT ETRE 256 1]', len(list_conserv))
+    
+
     ### Stochastic remainder without replacement selection + sharing -> pb
     liste_finale=[]
     score=0
-    k_exp=exp_scaling(actual_gen+1)
+    k_exp=exp_scaling(actual_gen+1+iteration_initial)
     total=0
     mi_value=[sharing(i1,clusters,gen_nb==0) for i1 in list_conserv]
     #print(f"[DEBUG]: tableau cree -> val max = {max(mi_value)}")
-    print(len(mi_value))
+    
     
     for i in range(len(list_conserv)):
       total+=(((list_conserv[i].fitness)**k_exp)/mi_value[i])
@@ -100,7 +113,7 @@ def generation(list_individus,gen_nb,cluster_list):
 
 
 
-    for i in range(len(list_conserv)): #pb ici
+    for i in range(len(list_conserv)):
       r_i=((((list_conserv[i].fitness)**k_exp))/mi_value[i])/moy_fitness
       
       a=floor(r_i)
@@ -109,18 +122,22 @@ def generation(list_individus,gen_nb,cluster_list):
         liste_finale.append(list_conserv[i])
     
     
-    print('[DEBUG] taille liste finale ',len(liste_finale))
+    
     association=[]
     for i in range(len(list_conserv)):
       debut=score
       score+=((((list_conserv[i].fitness)**k_exp))/mi_value[i])/moy_fitness-floor(((((list_conserv[i].fitness)**k_exp))/mi_value[i])/moy_fitness)
       fin=score
       association.append((list_conserv[i],debut,fin))
+    
     for _ in range(NB_INDIVIDUS-len(liste_finale)):
       a=random.uniform(0,1)
       liste_finale.append(find(association,a*score))
     #############[CALCUL DE DMOY + DELTA]########
     
+    #debug
+    
+
     with open(r'training.json') as training_file:
       data2 = json.load(training_file)
 
@@ -134,7 +151,7 @@ def generation(list_individus,gen_nb,cluster_list):
     
       
     individu_json={
-      'nb_generation':actual_gen,
+      'nb_generation':actual_gen+iteration_initial,
       'fitness_moyenne':moy_fitness,
       'delta':delta,
       'dmoy':dmoy,
@@ -144,10 +161,10 @@ def generation(list_individus,gen_nb,cluster_list):
       f.write(json.dumps(individu_json, indent=4))
     
     X_SCORE.append(moy_fitness)
-    Y_GEN.append(actual_gen)
+    Y_GEN.append(actual_gen+iteration_initial)
 
 
-    if actual_gen%10==0:
+    if (actual_gen+iteration_initial)%10==0:
       """ On enregistre le graphique de progression"""
       plt.xlabel="Fitness moyenne (comptée avec le scaling)"
       plt.ylabel="Génération"
@@ -156,8 +173,12 @@ def generation(list_individus,gen_nb,cluster_list):
     
 
     list_individus_n=liste_finale
+
+    for elem in list_individus_n:
+      print(elem.chromosomes)
+
     clean_clusters(clusters, [i.name for i in liste_finale])
-    print(f'Generation : {actual_gen} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp} | delta:{delta} | dmoy:{dmoy} |Nombre clusters : {len(clusters)} | Nombre individus : {len(liste_finale)}')
+    print(f'Generation : {actual_gen+iteration_initial} | score (avec scaling): {moy_fitness} | scaling_exp:{k_exp} | delta:{delta} | dmoy:{dmoy} |Nombre clusters : {len(clusters)} | Nombre individus : {len(liste_finale)}')
 
 def initialise_one_cpu(list_individus):
   list_temp=[]
@@ -212,7 +233,7 @@ def generate():
   with open(r"training.json", "w") as f:
     f.write(json.dumps(individu_json, indent=4))
   
-  generation(list_individus,NB_ITERATIONS,clusters)
+  generation(list_individus,NB_ITERATIONS,clusters,0)
         
 if __name__=='__main__':
   generate()

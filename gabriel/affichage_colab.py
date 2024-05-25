@@ -1,4 +1,3 @@
-from pickle import NONE
 import sys
 sys.path.insert(1, 'GeneticAlgoClean')
 from individu import *

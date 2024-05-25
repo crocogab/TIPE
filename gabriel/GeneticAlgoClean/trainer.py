@@ -2,7 +2,7 @@ from clean_genetic_algorithm import generation
 from individu import Individu
 from sharing import init_clusters,fusion_clusters
 import json
-import threading
+
 
 with open(r'training.json') as training_file:
     data = json.load(training_file)
@@ -32,8 +32,8 @@ for elem in list_chromosomes:
 
 
 clusters=init_clusters(liste_finale)
-fusion_clusters(clusters)
+fusion_clusters(clusters,False)
 print('Cluster fusionnes :)\n')
-generation(liste_finale, data2['nb_iterations']-data['nb_generation'],clusters)
+generation(liste_finale, data2['nb_iterations']-data['nb_generation'],clusters,data['nb_generation'])
 
 

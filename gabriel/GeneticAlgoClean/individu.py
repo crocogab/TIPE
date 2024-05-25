@@ -45,16 +45,13 @@ class Individu():
             self.chromosomes[i] = random.randint(0, 1)
     
     def convert(self,valeur:int,h_as:bool,valeur_croupier:int):
-        """ Renvoie l'indice du chromosome associé à une valeur"""
+        """ Renvoie l'indice du chromosome associé à une situation donnée"""
         i=self.croupier_converter(valeur_croupier) # 2-> 0 | 3->1 | 1->9 
         if h_as :
             if valeur >=10 and valeur<18:
                 return i*19+valeur
             else:
                 return i*19+18
-        
-            
-            
         else:
             if valeur>=2 and valeur<12:
                 return i*19
