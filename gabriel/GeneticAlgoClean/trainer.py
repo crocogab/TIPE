@@ -29,7 +29,7 @@ for elem in list_chromosomes:
     i1.evaluate()
     liste_finale.append(i1)
 
-
+print('generation actuelle',data['nb_generation'])
 
 clusters=init_clusters(liste_finale)
 fusion_clusters(clusters,False)

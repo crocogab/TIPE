@@ -2,15 +2,11 @@ import random
 import json
 import fastrand
 
-
-
-
 with open(r'config.json') as config_file:
     data = json.load(config_file)
 
 ############ Paramètres ############
 PROBA_ARRAY=[1,2,3,4,5,6,7,8,9,10,10,10,10]
-CROUPIER_MAIN=data['main_a_regarder'] #valeur de la main du croupier à observer
 PRECISION = data['precision']
 
 class Individu():
@@ -19,21 +15,6 @@ class Individu():
         self.fitness=0
         self.name='' #identifiant unique permet de conserver les memes individus dans plusieurs processus
         
-    
-    
-    
-    def __str__(self) -> str:
-        """Affichage un peu esthétique"""
-        i=self.croupier_converter(CROUPIER_MAIN)
-
-        return f"""        ---------------------------[ Croupier {CROUPIER_MAIN}--------------------------------- \n
-        Sans as : [2-11]| [12]| [13]| [14]| [15]| [16]| [17]| [18]| [19]| [20]\n
-                  [{self.chromosomes[i*19]}]   | [{self.chromosomes[i*19+1]}] | [{self.chromosomes[i*19+2]}] | [{self.chromosomes[i*19+3]}] | [{self.chromosomes[i*19+4]}] | [{self.chromosomes[i*19+5]}] | [{self.chromosomes[i*19+6]}] | [{self.chromosomes[i*19+7]}] | [{self.chromosomes[i*19+8]}] | [{self.chromosomes[i*19+9]}]\n
-        ----------------------------------------------------------------------
-        \n        Avec as : [10]| [11]| [12]| [13]| [14]| [15]| [16]| [17]| [18-20]
-        \n                  [{self.chromosomes[i*19+10]}] | [{self.chromosomes[i*19+11]}] | [{self.chromosomes[i*19+12]}] | [{self.chromosomes[i*19+13]}] | [{self.chromosomes[i*19+14]}] | [{self.chromosomes[i*19+15]}] | [{self.chromosomes[i*19+16]}] | [{self.chromosomes[i*19+17]}] | [{self.chromosomes[i*19+18]}]
-        \n        ----------------------------------------------------------------------"""
-
     def croupier_converter(self,valeur:int):
         if valeur==1:
             return 9
@@ -59,6 +40,7 @@ class Individu():
                 return i*19+valeur-11
     
     def calculate_val(self,tab:list):
+        """Calcule la valeur d'une main de blackjack en fonction des cartes présentes"""
         total=0
         has_use=False
         tab.sort(reverse=True)
@@ -83,18 +65,13 @@ class Individu():
         return total
     
     def play(self):
-      """Joue un 1v1 contre le croupier en fonction de ses chromosomes et voit si il gagne"""
-        
-      
+      """Joue une partie contre le croupier en fonction de la stratégie de ses chromsomes et voit si il gagne"""
       p_in_game=True
       c_in_game=True
       winner=False
       player_list=[PROBA_ARRAY[fastrand.pcg32bounded(13)]]
       croupier_list=[PROBA_ARRAY[fastrand.pcg32bounded(13)]]
-      
       while p_in_game or c_in_game :
-        
-        
         if p_in_game: #le joueur decide si il joue ou stop
           
           val=self.calculate_val(player_list)
@@ -129,13 +106,7 @@ class Individu():
       elif player_val<=21 and player_val>=croupier_val:
         winner=True
       elif croupier_val>21 and player_val<=21:
-        winner=True
-        
-  
-        
-        
-      #print(f"[DEBUG]: player_list : {player_list} \n croupier_list :{croupier_list} \n Value_p :{self.calculate_val(player_list)} \n Value p :{self.calculate_val(croupier_list)} \n WINNER : {winner} \n")
-      
+        winner=True   
       return winner
     
 
@@ -144,7 +115,7 @@ class Individu():
         count=0
         
         for _ in range(PRECISION):
-          if self.play():
+          if self.play(): #si l'individu a gagné sa partie
             count+=1
         
-        self.fitness= count/PRECISION
+        self.fitness= (count/PRECISION)*100

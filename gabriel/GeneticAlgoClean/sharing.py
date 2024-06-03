@@ -2,9 +2,7 @@ from individu import Individu
 from math import sqrt
 import json
 
-
-alpha=0.8
-
+alpha=0.7
 
 class cluster:
     def __init__(self) -> None:
@@ -54,9 +52,7 @@ def fusion_clusters(clusters: list,initial):
   for i in range(len(clusters)):
     for j in range(len(clusters)):
       if i!=j and (j not in liste_traitee) and (i not in liste_traitee):
-        if distance_liste(clusters[i].centre,clusters[j].centre)<=d_min: #distance inferieure au seuil -> on garde le cluster 1
-          #print(f"[DEBUG] fusion entre {c1} {c2}")
-          
+        if distance_liste(clusters[i].centre,clusters[j].centre)<=d_min: #distance inferieure au seuil -> on garde le cluster 1 
           clusters[i].individus.extend(clusters[j].individus)
           clusters[i].individus_name.extend(clusters[j].individus_name)
           if clusters[i].best_individu.fitness<clusters[j].best_individu.fitness: 
@@ -79,7 +75,7 @@ def add_individu(i1:Individu,clusters:list,initial):
   d_max=update_d(initial)[0]
   etat=0
   indice=-1
-  for indice_c in range(len(clusters)): # len(clusters) calcul de distance (<nb individu) -> negligeable
+  for indice_c in range(len(clusters)): 
     if distance_liste(i1.chromosomes,clusters[indice_c].centre)<d_max:
       etat=1
       indice=indice_c
@@ -94,9 +90,6 @@ def add_individu(i1:Individu,clusters:list,initial):
     for i in range(a): #recalcul du centre du cluster
       for l in range(190):
         clusters[indice].centre[l]+=(clusters[indice].individus[i].chromosomes[l])/a
-    
-    
-  
   else:
     c=cluster()
     c.individus=[i1]
@@ -130,9 +123,8 @@ def remove_individu(i1:Individu,clusters:list):
           for l in range(190):
             clusters[i].centre[l]+=(clusters[i].individus[j].chromosomes[l])/a
         return None
-
       else:
-        #on supprime clusters de taille 
+        #on supprime clusters de taille 1
         clusters.pop(i)
         return None
 
@@ -141,7 +133,6 @@ def remove_individu(i1:Individu,clusters:list):
 def individu_clusters(i1: Individu, clusters: list):
     """Nombre d'individus dans le cluster de i1"""
     #un individu peut etre dans plusieurs clusters -> on renvoie distance min
-
     distance=distance_individus(i1, clusters[0].centre)
     retour=len(clusters[0].individus),clusters[0]
     for i in range(len(clusters)):
@@ -151,11 +142,6 @@ def individu_clusters(i1: Individu, clusters: list):
     
     return retour
     
-    
-    #for i in range(len(clusters)):
-    #   print(clusters[i].individus_name)
-    #print( f"Error individu not found {type(clusters[i])} {i1.name}") 
-    
 
 
 def sharing(i1:Individu,clusters:list,initial):
@@ -164,5 +150,5 @@ def sharing(i1:Individu,clusters:list,initial):
   try:
     nc,c=individu_clusters(i1,clusters)
     return nc*(1-(((distance_liste(i1.chromosomes,c.centre))/(2*d_max))**alpha))
-  except: #permet d'eviter crash total si bug -> plus erreur normalement
+  except: #permet d'eviter crash total si erreur -> plus de problèmes maintenant
     return 1

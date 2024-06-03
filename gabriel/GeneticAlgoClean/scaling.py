@@ -9,4 +9,5 @@ NB_ITERATIONS=data['nb_iterations']
 
 def exp_scaling(iterations_actuelle:int):
     """ permet un scaling exponentiel"""
-    return 1/((tan((iterations_actuelle/NB_ITERATIONS)*(pi/2)))**P)
+    return ((tan((iterations_actuelle/NB_ITERATIONS)*(pi/2)))**P) #peut etre inverse sans certaines situations
+
